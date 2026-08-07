@@ -99,8 +99,12 @@ export class NewCommitmentComponent implements OnInit {
       this.form.markAllAsTouched();
       return;
     }
-    if (post) this.savingPost.set(true);
-    else this.savingDraft.set(true);
+    if (post) {
+      this.savingPost.set(true);
+    }
+    else {
+      this.savingDraft.set(true);
+    }
 
     const { dueDate, ...rest } = this.form.getRawValue();
     const payload = {

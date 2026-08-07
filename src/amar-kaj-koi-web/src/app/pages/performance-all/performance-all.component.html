@@ -1,14 +1,8 @@
 <div class="container-page">
   <h1>Team Performance</h1>
   <p-card>
-    <p-table
-      [value]="rows()"
-      [loading]="loading()"
-      [paginator]="true"
-      [rows]="10"
-      [rowsPerPageOptions]="[10, 20, 50]"
-      styleClass="p-datatable-sm"
-    >
+    <p-table [value]="rows()" [loading]="loading()" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 20, 50]"
+      styleClass="p-datatable-sm">
       <ng-template pTemplate="header">
         <tr>
           <th>Employee</th>
@@ -34,11 +28,8 @@
           <td>{{ r.overdue }}</td>
           <td>
             <div class="row">
-              <p-progressBar
-                [value]="r.passRate"
-                [style]="{ width: '80px', height: '8px' }"
-                [showValue]="false"
-              ></p-progressBar>
+              <p-progressBar [value]="r.passRate" [style]="{ width: '80px', height: '8px' }"
+                [showValue]="false"></p-progressBar>
               <span>{{ r.passRate }}%</span>
             </div>
           </td>

@@ -56,8 +56,12 @@ export class NewTargetComponent {
       return;
     }
 
-    if (post) this.savingPost.set(true);
-    else this.savingDraft.set(true);
+    if (post) {
+      this.savingPost.set(true);
+    }
+    else {
+      this.savingDraft.set(true);
+    }
 
     const { taskName, description } = this.form.getRawValue();
 

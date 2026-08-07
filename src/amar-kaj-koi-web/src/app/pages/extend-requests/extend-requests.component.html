@@ -2,54 +2,44 @@
   <h1>Pending Extend / Revise Requests</h1>
 
   @if (loading()) {
-    <p-card><span class="muted">Loading…</span></p-card>
+  <p-card><span class="muted">Loading…</span></p-card>
   }
 
   @for (r of requests(); track r.requestId) {
-    <p-card styleClass="mb-3">
-      <div>
-        <p-tag [value]="r.requestType" severity="warn"></p-tag>
-        requested by <b>{{ r.requestedByName }}</b> — task
-        <a [routerLink]="['/tasks', r.taskId]">#{{ r.taskId }}</a>
-      </div>
-      @if (r.requestedDueDate) {
-        <div>
-          New due date: <b>{{ r.requestedDueDate | date: 'mediumDate' }}</b>
-        </div>
-      }
-      @if (r.reasonText) {
-        <div>Reason: {{ r.reasonText }}</div>
-      }
-      @if (r.voiceFileId) {
-        <app-voice-player [voiceFileId]="r.voiceFileId" style="margin-top: 8px"></app-voice-player>
-      }
-      <div class="field" style="margin-top: 8px">
-        <label>Decision reason (required to reject)</label>
-        <textarea pTextarea [formControl]="reasonForm.controls[r.requestId]" rows="2"></textarea>
-      </div>
-      <div class="row">
-        <p-button
-          label="Approve"
-          icon="pi pi-check"
-          severity="success"
-          (onClick)="decide(r.requestId, true)"
-        ></p-button>
-        <p-button
-          label="Reject"
-          icon="pi pi-times"
-          severity="danger"
-          (onClick)="decide(r.requestId, false)"
-        ></p-button>
-      </div>
-    </p-card>
+  <p-card styleClass="mb-3">
+    <div>
+      <p-tag [value]="r.requestType" severity="warn"></p-tag>
+      requested by <b>{{ r.requestedByName }}</b> — task
+      <a [routerLink]="['/tasks', r.taskId]">#{{ r.taskId }}</a>
+    </div>
+    @if (r.requestedDueDate) {
+    <div>
+      New due date: <b>{{ r.requestedDueDate | date: 'mediumDate' }}</b>
+    </div>
+    }
+    @if (r.reasonText) {
+    <div>Reason: {{ r.reasonText }}</div>
+    }
+    @if (r.voiceFileId) {
+    <app-voice-player [voiceFileId]="r.voiceFileId" style="margin-top: 8px"></app-voice-player>
+    }
+    <div class="field" style="margin-top: 8px">
+      <label>Decision reason (required to reject)</label>
+      <textarea pTextarea [formControl]="reasonForm.controls[r.requestId]" rows="2"></textarea>
+    </div>
+    <div class="row">
+      <p-button label="Approve" icon="pi pi-check" severity="success" (onClick)="decide(r.requestId, true)"></p-button>
+      <p-button label="Reject" icon="pi pi-times" severity="danger" (onClick)="decide(r.requestId, false)"></p-button>
+    </div>
+  </p-card>
   }
 
   @if (!loading() && !requests().length) {
-    <p-card>
-      <div style="text-align: center; padding: 20px">
-        <i class="pi pi-check-circle" style="font-size: 32px; color: var(--p-green-500)"></i>
-        <p class="muted">Nothing pending.</p>
-      </div>
-    </p-card>
+  <p-card>
+    <div style="text-align: center; padding: 20px">
+      <i class="pi pi-check-circle" style="font-size: 32px; color: var(--p-green-500)"></i>
+      <p class="muted">Nothing pending.</p>
+    </div>
+  </p-card>
   }
 </div>

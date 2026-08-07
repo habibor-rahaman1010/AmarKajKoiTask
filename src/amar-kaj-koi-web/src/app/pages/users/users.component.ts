@@ -38,7 +38,7 @@ export class UsersComponent implements OnInit {
     username: ['', Validators.required],
     email: ['', [Validators.required, Validators.email]],
     password: ['', Validators.required],
-    roleName: 'Employee',
+    roleName: ['Employee'],
   });
 
   public readonly roleOptions = [

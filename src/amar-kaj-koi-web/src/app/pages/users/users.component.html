@@ -15,34 +15,18 @@
       </div>
       <div class="field">
         <label>Role</label>
-        <p-select
-          formControlName="roleName"
-          [options]="roleOptions"
-          optionLabel="label"
-          optionValue="value"
-          styleClass="w-full"
-        ></p-select>
+        <p-select formControlName="roleName" [options]="roleOptions" optionLabel="label" optionValue="value"
+          styleClass="w-full"></p-select>
       </div>
       <div style="align-self: end">
-        <p-button
-          label="Create User"
-          icon="pi pi-user-plus"
-          [disabled]="form.invalid"
-          (onClick)="save()"
-        ></p-button>
+        <p-button label="Create User" icon="pi pi-user-plus" [disabled]="form.invalid" (onClick)="save()"></p-button>
       </div>
     </div>
   </p-card>
 
   <p-card header="All Users">
-    <p-table
-      [value]="users()"
-      [rowHover]="true"
-      [paginator]="true"
-      [rows]="10"
-      [rowsPerPageOptions]="[10, 20, 50]"
-      styleClass="p-datatable-sm"
-    >
+    <p-table [value]="users()" [rowHover]="true" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 20, 50]"
+      styleClass="p-datatable-sm">
       <ng-template pTemplate="header">
         <tr>
           <th>Name</th>

@@ -1,67 +1,47 @@
 <div class="container-page">
   <div class="between">
     <h1>Notifications</h1>
-    <p-button
-      label="Mark all read"
-      icon="pi pi-check-square"
-      severity="secondary"
-      (onClick)="markAll()"
-    ></p-button>
+    <p-button label="Mark all read" icon="pi pi-check-square" severity="secondary" (onClick)="markAll()"></p-button>
   </div>
 
   @if (loading()) {
-    <p-card><span class="muted">Loading…</span></p-card>
+  <p-card><span class="muted">Loading…</span></p-card>
   }
 
   @for (n of pagedNotifications(); track n.notificationId) {
-    <p-card [styleClass]="'notif ' + (n.isRead ? '' : 'unread') + ' mb-2'">
-      <div class="between">
+  <p-card [styleClass]="'notif ' + (n.isRead ? '' : 'unread') + ' mb-2'">
+    <div class="between">
+      <div>
         <div>
-          <div>
-            <b>{{ n.title }}</b>
-            @if (!n.isRead) {
-              <p-badge severity="info" value="New" styleClass="ml-2"></p-badge>
-            }
-          </div>
-          @if (n.body) {
-            <div class="muted">{{ n.body }}</div>
-          }
-          <div class="muted small">{{ n.createdAt | date: 'medium' }}</div>
-        </div>
-        <div class="row">
-          @if (n.taskId) {
-            <p-button
-              icon="pi pi-external-link"
-              label="Open"
-              severity="secondary"
-              [outlined]="true"
-              [routerLink]="['/tasks', n.taskId]"
-            ></p-button>
-          }
+          <b>{{ n.title }}</b>
           @if (!n.isRead) {
-            <p-button
-              icon="pi pi-check"
-              label="Mark read"
-              [text]="true"
-              (onClick)="mark(n.notificationId)"
-            ></p-button>
+          <p-badge severity="info" value="New" styleClass="ml-2"></p-badge>
           }
         </div>
+        @if (n.body) {
+        <div class="muted">{{ n.body }}</div>
+        }
+        <div class="muted small">{{ n.createdAt | date: 'medium' }}</div>
       </div>
-    </p-card>
+      <div class="row">
+        @if (n.taskId) {
+        <p-button icon="pi pi-external-link" label="Open" severity="secondary" [outlined]="true"
+          [routerLink]="['/tasks', n.taskId]"></p-button>
+        }
+        @if (!n.isRead) {
+        <p-button icon="pi pi-check" label="Mark read" [text]="true" (onClick)="mark(n.notificationId)"></p-button>
+        }
+      </div>
+    </div>
+  </p-card>
   }
 
   @if (notifications().length > rows()) {
-    <p-paginator
-      [first]="first()"
-      [rows]="rows()"
-      [totalRecords]="notifications().length"
-      [rowsPerPageOptions]="[10, 20, 50]"
-      (onPageChange)="onPage($event)"
-    ></p-paginator>
+  <p-paginator [first]="first()" [rows]="rows()" [totalRecords]="notifications().length"
+    [rowsPerPageOptions]="[10, 20, 50]" (onPageChange)="onPage($event)"></p-paginator>
   }
 
   @if (!loading() && !notifications().length) {
-    <p-card><span class="muted">No notifications.</span></p-card>
+  <p-card><span class="muted">No notifications.</span></p-card>
   }
 </div>

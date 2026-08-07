@@ -2,12 +2,7 @@
   <h1>Pending Commitment Approvals</h1>
 
   <p-card>
-    <p-table
-      [value]="pending()"
-      [loading]="loading()"
-      [rowHover]="true"
-      styleClass="p-datatable-sm"
-    >
+    <p-table [value]="pending()" [loading]="loading()" [rowHover]="true" styleClass="p-datatable-sm">
       <ng-template pTemplate="header">
         <tr>
           <th>Task</th>
@@ -25,36 +20,14 @@
           <td>{{ t.createdByName }}</td>
           <td>{{ t.dueDate ? (t.dueDate | date: 'mediumDate') : '—' }}</td>
           <td>
-            <p-select
-              [formControl]="assignForm.controls[t.taskId]"
-              [options]="employeeOptions()"
-              optionLabel="label"
-              optionValue="value"
-              placeholder="Keep creator"
-              [showClear]="true"
-              styleClass="w-full"
-            ></p-select>
+            <p-select [formControl]="assignForm.controls[t.taskId]" [options]="employeeOptions()" optionLabel="label"
+              optionValue="value" placeholder="Keep creator" [showClear]="true" styleClass="w-full"></p-select>
           </td>
           <td>
             <div class="row">
-              <p-button
-                icon="pi pi-check"
-                label="Approve"
-                severity="success"
-                (onClick)="approve(t.taskId)"
-              ></p-button>
-              <p-button
-                icon="pi pi-reply"
-                label="Send Back"
-                severity="warn"
-                (onClick)="sendBack(t.taskId)"
-              ></p-button>
-              <p-button
-                icon="pi pi-times"
-                label="Reject"
-                severity="danger"
-                (onClick)="reject(t.taskId)"
-              ></p-button>
+              <p-button icon="pi pi-check" label="Approve" severity="success" (onClick)="approve(t.taskId)"></p-button>
+              <p-button icon="pi pi-reply" label="Send Back" severity="warn" (onClick)="sendBack(t.taskId)"></p-button>
+              <p-button icon="pi pi-times" label="Reject" severity="danger" (onClick)="reject(t.taskId)"></p-button>
             </div>
           </td>
         </tr>

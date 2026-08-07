@@ -29,13 +29,8 @@
   </div>
 
   <p-card header="Recent Tasks" styleClass="mt-4">
-    <p-table
-      [value]="recentTasks()"
-      [loading]="loading()"
-      [rowHover]="true"
-      styleClass="p-datatable-sm"
-      [tableStyle]="{ 'min-width': '600px' }"
-    >
+    <p-table [value]="recentTasks()" [loading]="loading()" [rowHover]="true" styleClass="p-datatable-sm"
+      [tableStyle]="{ 'min-width': '600px' }">
       <ng-template pTemplate="header">
         <tr>
           <th>Task</th>
@@ -49,10 +44,7 @@
         <tr>
           <td>
             @if (t.isPinned) {
-              <i
-                class="pi pi-bookmark-fill"
-                style="color: var(--p-orange-500); margin-right: 4px"
-              ></i>
+            <i class="pi pi-bookmark-fill" style="color: var(--p-orange-500); margin-right: 4px"></i>
             }
             {{ t.taskName }}
           </td>
@@ -62,13 +54,8 @@
           </td>
           <td>{{ t.dueDate ? (t.dueDate | date: 'mediumDate') : '—' }}</td>
           <td>
-            <p-button
-              icon="pi pi-external-link"
-              severity="secondary"
-              [text]="true"
-              [rounded]="true"
-              [routerLink]="['/tasks', t.taskId]"
-            ></p-button>
+            <p-button icon="pi pi-external-link" severity="secondary" [text]="true" [rounded]="true"
+              [routerLink]="['/tasks', t.taskId]"></p-button>
           </td>
         </tr>
       </ng-template>

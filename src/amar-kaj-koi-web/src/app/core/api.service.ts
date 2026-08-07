@@ -35,20 +35,25 @@ export class ApiService {
   public taskCenters(): Observable<TaskCenterRef[]> {
     return this.http.get<TaskCenterRef[]>(`${this.base}/reference/task-centers`);
   }
+
   public eventChannels(): Observable<EventChannelRef[]> {
     return this.http.get<EventChannelRef[]>(`${this.base}/reference/event-channels`);
   }
+
   public dayEvents(channelId?: string): Observable<DayEventRef[]> {
     let params = new HttpParams();
     if (channelId) params = params.set('eventChannelId', channelId);
     return this.http.get<DayEventRef[]>(`${this.base}/reference/day-events`, { params });
   }
+
   public statuses(): Observable<StatusRef[]> {
     return this.http.get<StatusRef[]>(`${this.base}/reference/statuses`);
   }
+
   public employees(): Observable<EmployeeRef[]> {
     return this.http.get<EmployeeRef[]>(`${this.base}/reference/employees`);
   }
+
   public allUsers(): Observable<EmployeeRef[]> {
     return this.http.get<EmployeeRef[]>(`${this.base}/reference/users`);
   }
@@ -57,10 +62,13 @@ export class ApiService {
   public listTasks(f: TaskFilter): Observable<TaskListItem[]> {
     let params = new HttpParams();
     Object.entries(f || {}).forEach(([k, v]) => {
-      if (v !== undefined && v !== null && v !== '') params = params.set(k, v as any);
+      if (v !== undefined && v !== null && v !== '') {
+        params = params.set(k, v as any);
+      }
     });
     return this.http.get<TaskListItem[]>(`${this.base}/tasks`, { params });
   }
+
   public listAllTasks(f: TaskFilter): Observable<TaskListItem[]> {
     let params = new HttpParams();
     Object.entries(f || {}).forEach(([k, v]) => {
@@ -68,6 +76,7 @@ export class ApiService {
     });
     return this.http.get<TaskListItem[]>(`${this.base}/tasks/all`, { params });
   }
+
   public listMyCreatedTasks(f: TaskFilter = {}): Observable<TaskListItem[]> {
     let params = new HttpParams();
     Object.entries(f || {}).forEach(([k, v]) => {
@@ -75,48 +84,63 @@ export class ApiService {
     });
     return this.http.get<TaskListItem[]>(`${this.base}/tasks/mine`, { params });
   }
+
   public getTask(id: string): Observable<TaskDetail> {
     return this.http.get<TaskDetail>(`${this.base}/tasks/${id}`);
   }
+
   public createTarget(data: any): Observable<{ taskId: string }> {
     return this.http.post<{ taskId: string }>(`${this.base}/tasks/target`, data);
   }
+
   public createCommitment(data: any): Observable<{ taskId: string }> {
     return this.http.post<{ taskId: string }>(`${this.base}/tasks/commitment`, data);
   }
+
   public editCommitment(data: any): Observable<void> {
     return this.http.put<void>(`${this.base}/tasks/commitment`, data);
   }
+
   public editTarget(data: any): Observable<void> {
     return this.http.put<void>(`${this.base}/tasks/target`, data);
   }
+
   public postTask(id: string): Observable<void> {
     return this.http.post<void>(`${this.base}/tasks/${id}/post`, {});
   }
+
   public deleteDraft(id: string): Observable<void> {
     return this.http.delete<void>(`${this.base}/tasks/${id}`);
   }
+
   public approveTask(taskId: string, assignedToUserId?: string): Observable<void> {
     return this.http.post<void>(`${this.base}/tasks/approve`, { taskId, assignedToUserId });
   }
+
   public rejectTask(taskId: string, reason: string): Observable<void> {
     return this.http.post<void>(`${this.base}/tasks/reject`, { taskId, reason });
   }
+
   public sendBackTask(taskId: string, reason: string): Observable<void> {
     return this.http.post<void>(`${this.base}/tasks/send-back`, { taskId, reason });
   }
+
   public voiceReviewComplete(data: any): Observable<void> {
     return this.http.post<void>(`${this.base}/tasks/voice-review/complete`, data);
   }
+
   public voiceReviewSendBack(taskId: string, reason: string): Observable<void> {
     return this.http.post<void>(`${this.base}/tasks/voice-review/send-back`, { taskId, reason });
   }
+
   public requestExtend(data: any): Observable<void> {
     return this.http.post<void>(`${this.base}/tasks/extend-request`, data);
   }
+
   public pendingExtends(): Observable<ExtendRequest[]> {
     return this.http.get<ExtendRequest[]>(`${this.base}/tasks/extend-request/pending`);
   }
+
   public decideExtend(requestId: string, approve: boolean, reason?: string): Observable<void> {
     return this.http.post<void>(`${this.base}/tasks/extend-request/decide`, {
       requestId,
@@ -124,9 +148,11 @@ export class ApiService {
       reason,
     });
   }
+
   public requestMarkPassed(taskId: string, note?: string): Observable<void> {
     return this.http.post<void>(`${this.base}/tasks/request-mark-passed`, { taskId, note });
   }
+
   public markFinal(
     taskId: string,
     decision: 'Passed' | 'Failed' | 'Cancelled',
@@ -134,6 +160,7 @@ export class ApiService {
   ): Observable<void> {
     return this.http.post<void>(`${this.base}/tasks/final`, { taskId, decision, comment });
   }
+
   public bulkFinal(
     taskIds: string[],
     decision: 'Passed' | 'Failed' | 'Cancelled',
@@ -145,22 +172,28 @@ export class ApiService {
       comment,
     });
   }
+
   public changeDueDate(taskId: string, newDueDate: string, note?: string): Observable<void> {
     return this.http.post<void>(`${this.base}/tasks/due-date`, { taskId, newDueDate, note });
   }
+
   public changeAssignee(taskId: string, newAssigneeUserId: string): Observable<void> {
     return this.http.post<void>(`${this.base}/tasks/assignee`, { taskId, newAssigneeUserId });
   }
+
   public pinTask(taskId: string, pinned: boolean): Observable<void> {
     let params = new HttpParams().set('pinned', pinned);
     return this.http.post<void>(`${this.base}/tasks/${taskId}/pin`, {}, { params });
   }
+
   public attachVoiceCommitment(taskId: string, voiceFileId: string): Observable<void> {
     return this.http.post<void>(`${this.base}/tasks/${taskId}/voice-commitment/${voiceFileId}`, {});
   }
+
   public runOverdueSweep(): Observable<{ affected: number }> {
     return this.http.post<{ affected: number }>(`${this.base}/tasks/run-overdue-sweep`, {});
   }
+
   public reopenTask(taskId: string): Observable<void> {
     return this.http.post<void>(`${this.base}/tasks/${taskId}/reopen`, {});
   }
@@ -169,6 +202,7 @@ export class ApiService {
   public selfPerformance(): Observable<PerformanceRow> {
     return this.http.get<PerformanceRow>(`${this.base}/tasks/performance/self`);
   }
+
   public allPerformance(): Observable<PerformanceRow[]> {
     return this.http.get<PerformanceRow[]>(`${this.base}/tasks/performance/all`);
   }
@@ -178,13 +212,16 @@ export class ApiService {
     let params = new HttpParams().set('onlyUnread', onlyUnread);
     return this.http.get<NotificationDto[]>(`${this.base}/notifications`, { params });
   }
+
   /** Seeds the badge on load; after that the notifications hub keeps it current. */
   public unreadNotifCount(): Observable<{ count: number }> {
     return this.http.get<{ count: number }>(`${this.base}/notifications/unread-count`);
   }
+
   public markNotifRead(id: string): Observable<void> {
     return this.http.post<void>(`${this.base}/notifications/${id}/read`, {});
   }
+
   public markAllNotifRead(): Observable<void> {
     return this.http.post<void>(`${this.base}/notifications/read-all`, {});
   }
@@ -202,6 +239,7 @@ export class ApiService {
     fd.append('durationSecs', String(durationSecs));
     return this.http.post<VoiceUploadResponse>(`${this.base}/voice/upload`, fd);
   }
+
   /**
    * Playback has to pull the bytes down here rather than pointing an <audio src>
    * at the endpoint: /api/voice/{id} is [Authorize]d and the bearer token is only
