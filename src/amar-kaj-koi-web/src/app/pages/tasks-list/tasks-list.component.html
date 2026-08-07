@@ -1,0 +1,175 @@
+<div class="container-page">
+  <div class="between">
+    <h1>Tasks</h1>
+    <div class="row">
+      @if (isRole(['Employee'])) {
+        <p-button
+          label="New Commitment"
+          icon="pi pi-plus"
+          routerLink="/tasks/new-commitment"
+        ></p-button>
+      }
+      @if (isRole(['TopManagement'])) {
+        <p-button
+          label="New Voice Target"
+          icon="pi pi-microphone"
+          routerLink="/tasks/new-target"
+        ></p-button>
+      }
+    </div>
+  </div>
+
+  <p-card styleClass="mb-3">
+    <div class="filters" [formGroup]="filterForm">
+      <div class="field">
+        <label>Search</label>
+        <input
+          pInputText
+          formControlName="search"
+          (keyup.enter)="load()"
+          placeholder="task name…"
+        />
+      </div>
+      <div class="field">
+        <label>Status</label>
+        <p-select
+          formControlName="statusId"
+          [options]="statusOptions()"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="All"
+          [showClear]="true"
+          styleClass="w-full"
+        ></p-select>
+      </div>
+      <div class="field">
+        <label>From</label>
+        <p-datePicker
+          formControlName="fromDate"
+          dateFormat="yy-mm-dd"
+          [showIcon]="true"
+          styleClass="w-full"
+        ></p-datePicker>
+      </div>
+      <div class="field">
+        <label>To</label>
+        <p-datePicker
+          formControlName="toDate"
+          dateFormat="yy-mm-dd"
+          [showIcon]="true"
+          styleClass="w-full"
+        ></p-datePicker>
+      </div>
+      <div class="row" style="align-self: end">
+        <p-button label="Apply" icon="pi pi-search" (onClick)="load()"></p-button>
+        <p-button
+          label="Reset"
+          icon="pi pi-refresh"
+          severity="secondary"
+          (onClick)="reset()"
+        ></p-button>
+      </div>
+    </div>
+  </p-card>
+
+  <p-card>
+    @if (isRole(['TopManagement']) && selected.length > 0) {
+      <div class="bulk-bar">
+        <span
+          ><b>{{ selected.length }}</b> selected</span
+        >
+        <p-button
+          label="Mark Passed"
+          icon="pi pi-check"
+          severity="success"
+          (onClick)="bulk('Passed')"
+        ></p-button>
+        <p-button
+          label="Mark Failed"
+          icon="pi pi-times"
+          severity="danger"
+          (onClick)="bulk('Failed')"
+        ></p-button>
+        <p-button
+          label="Cancel"
+          icon="pi pi-ban"
+          severity="secondary"
+          (onClick)="bulk('Cancelled')"
+        ></p-button>
+      </div>
+    }
+
+    <p-table
+      [value]="tasks()"
+      [loading]="loading()"
+      [rowHover]="true"
+      [paginator]="true"
+      [rows]="10"
+      [(selection)]="selectedRows"
+      (selectionChange)="onSelectionChange()"
+      dataKey="taskId"
+      styleClass="p-datatable-sm"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          @if (isRole(['TopManagement'])) {
+            <th style="width: 3rem">
+              <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+            </th>
+          }
+          <th>Task</th>
+          <th>Type</th>
+          <th>Assignee</th>
+          <th>Due</th>
+          <th>Status</th>
+          <th>Requests</th>
+          <th></th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-t>
+        <tr>
+          @if (isRole(['TopManagement'])) {
+            <td>
+              <p-tableCheckbox [value]="t"></p-tableCheckbox>
+            </td>
+          }
+          <td>
+            @if (t.isPinned) {
+              <i
+                class="pi pi-bookmark-fill"
+                style="color: var(--p-orange-500); margin-right: 4px"
+              ></i>
+            }
+            {{ t.taskName }}
+            <div class="muted small">
+              {{ t.taskCenter || '' }} {{ t.eventChannel ? '· ' + t.eventChannel : '' }}
+            </div>
+          </td>
+          <td>{{ t.taskType }}</td>
+          <td>{{ t.assignedToName || '—' }}</td>
+          <td>{{ t.dueDate ? (t.dueDate | date: 'mediumDate') : '—' }}</td>
+          <td>
+            <span class="status-badge status-{{ t.statusCode }}">{{ t.statusName }}</span>
+          </td>
+          <td>{{ t.requestCount }}/3</td>
+          <td>
+            <p-button
+              icon="pi pi-external-link"
+              severity="secondary"
+              [text]="true"
+              [rounded]="true"
+              [routerLink]="['/tasks', t.taskId]"
+            ></p-button>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td [attr.colspan]="isRole(['TopManagement']) ? 8 : 7">
+            <span class="muted">No tasks found.</span>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+</div>

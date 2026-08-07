@@ -1,0 +1,7 @@
+:host ::ng-deep .form-card {
+  max-width: 800px;
+}
+
+.w-full {
+  width: 100%;
+}

@@ -1,0 +1,32 @@
+.stats {
+  margin-bottom: 20px;
+}
+
+.stat {
+  text-align: center;
+  padding: 4px 0;
+}
+
+.lbl {
+  font-size: 12px;
+  text-transform: uppercase;
+  color: var(--p-text-muted-color);
+  margin-bottom: 8px;
+}
+
+.num {
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.num.warn {
+  color: #dc2626;
+}
+
+.num.info {
+  color: var(--p-primary-600, #4f46e5);
+}
+
+.mt-4 {
+  margin-top: 16px;
+}

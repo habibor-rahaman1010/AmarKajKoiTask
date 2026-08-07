@@ -1,0 +1,59 @@
+.detail-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+@media (min-width: 900px) {
+  .detail-layout {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px 20px;
+  font-size: 14px;
+}
+@media (min-width: 500px) {
+  .detail-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+.mb-3 {
+  margin-bottom: 16px;
+}
+.w-full {
+  width: 100%;
+}
+/* No opposite template is used here, but PrimeNG renders that column regardless
+ and gives it flex: 1 — half the card. It went unnoticed while action types were
+ single unbreakable words that just overflowed it; spacing them out made them
+ wrap inside the leftover half instead. Collapsing it returns the full width. */
+:host ::ng-deep .p-timeline .p-timeline-event-opposite {
+  flex: 0;
+  padding: 0;
+}
+:host ::ng-deep .p-timeline .p-timeline-event-content {
+  padding: 4px 12px;
+}
+
+/* The marker and the content sit in sibling flex columns, and the separator is a
+ column flex box — so the dot lands at the very top of the row while the title
+ starts one padding-step lower. Giving the marker the title's exact line box,
+ offset by that same padding, puts the dot on the title's midline. Both heights
+ are set here rather than inherited so they cannot drift apart. */
+.tl-title {
+  line-height: 20px;
+}
+.tl-marker {
+  display: flex;
+  align-items: center;
+  height: 20px; /* matches .tl-title's line box */
+  margin-top: 4px; /* matches the content's top padding */
+  color: var(--p-primary-500);
+}
+/* line-height only — the glyph keeps its own size, this just gives it a tight
+ box so the flex centring above lands where it should. */
+.tl-marker .pi {
+  line-height: 1;
+}

@@ -1,0 +1,120 @@
+<div class="container-page">
+  <h1>Voice Review Dashboard</h1>
+  <p class="muted">All voice-based targets awaiting your review.</p>
+
+  @for (t of pending(); track t.taskId) {
+    <p-card styleClass="mb-3">
+      <div class="between">
+        <div>
+          <h2 style="margin: 0">{{ t.taskName }}</h2>
+          <div class="muted">
+            Created by {{ t.createdByName }} · {{ t.createdAt | date: 'medium' }}
+          </div>
+        </div>
+        <p-button
+          icon="pi pi-external-link"
+          severity="secondary"
+          [outlined]="true"
+          [routerLink]="['/tasks', t.taskId]"
+          label="View"
+          target="_blank"
+        ></p-button>
+      </div>
+      @if (voiceLoaded()[t.taskId]) {
+        <app-voice-player
+          [voiceFileId]="voiceLoaded()[t.taskId]"
+          style="margin-top: 10px"
+        ></app-voice-player>
+      }
+      <div class="review-grid" [formGroup]="forms.controls[t.taskId]">
+        <div class="field">
+          <label>Task Name</label>
+          <input pInputText formControlName="taskName" />
+        </div>
+        <div class="field">
+          <label>Task Center</label>
+          <p-select
+            formControlName="taskCenterId"
+            [options]="centerOptions()"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Select"
+            styleClass="w-full"
+          ></p-select>
+        </div>
+        <div class="field">
+          <label>Event Channel</label>
+          <p-select
+            formControlName="eventChannelId"
+            [options]="channelOptions()"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Select"
+            (onChange)="loadDays(t.taskId, $event.value)"
+            styleClass="w-full"
+          ></p-select>
+        </div>
+        <div class="field">
+          <label>Day Event</label>
+          <p-select
+            formControlName="dayEventId"
+            [options]="daysByTask()[t.taskId] || []"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Select"
+            [showClear]="true"
+            styleClass="w-full"
+          ></p-select>
+        </div>
+        <div class="field">
+          <label>Due Date *</label>
+          <p-datePicker
+            formControlName="dueDate"
+            dateFormat="yy-mm-dd"
+            [showIcon]="true"
+            [minDate]="today"
+            styleClass="w-full"
+          ></p-datePicker>
+        </div>
+        <div class="field">
+          <label>Assigned To *</label>
+          <p-select
+            formControlName="assignedToUserId"
+            [options]="employeeOptions()"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Select"
+            styleClass="w-full"
+          ></p-select>
+        </div>
+      </div>
+      <div class="row">
+        <p-button
+          label="Save & Open Task"
+          icon="pi pi-check"
+          severity="success"
+          [disabled]="!isValid(t.taskId)"
+          (onClick)="complete(t.taskId)"
+        ></p-button>
+        <p-button
+          label="Send Back for Correction"
+          icon="pi pi-reply"
+          severity="warn"
+          (onClick)="sendBack(t.taskId)"
+        ></p-button>
+      </div>
+    </p-card>
+  }
+
+  @if (!pending().length && !loading()) {
+    <p-card>
+      <div class="empty">
+        <i class="pi pi-check-circle" style="font-size: 32px; color: var(--p-green-500)"></i>
+        <p>Nothing pending. Great work!</p>
+      </div>
+    </p-card>
+  }
+  @if (loading()) {
+    <p-card><span class="muted">Loading…</span></p-card>
+  }
+</div>

@@ -1,0 +1,59 @@
+<div class="container-page">
+  <h1>My Commitments</h1>
+  <p class="muted">Tasks you created (Commitments or Voice Targets)</p>
+
+  <p-card>
+    <p-table
+      [value]="tasks()"
+      [loading]="loading()"
+      [rowHover]="true"
+      [paginator]="true"
+      [rows]="10"
+      styleClass="p-datatable-sm"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Task</th>
+          <th>Type</th>
+          <th>Due</th>
+          <th>Status</th>
+          <th>Requests</th>
+          <th></th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-t>
+        <tr>
+          <td>
+            @if (t.isPinned) {
+              <i
+                class="pi pi-bookmark-fill"
+                style="color: var(--p-orange-500); margin-right: 4px"
+              ></i>
+            }
+            {{ t.taskName }}
+          </td>
+          <td>{{ t.taskType }}</td>
+          <td>{{ t.dueDate ? (t.dueDate | date: 'mediumDate') : '—' }}</td>
+          <td>
+            <span class="status-badge status-{{ t.statusCode }}">{{ t.statusName }}</span>
+          </td>
+          <td>{{ t.requestCount }}/3</td>
+          <td>
+            <p-button
+              icon="pi pi-external-link"
+              severity="secondary"
+              [text]="true"
+              [rounded]="true"
+              [routerLink]="['/tasks', t.taskId]"
+            ></p-button>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="6"><span class="muted">You haven't created any tasks yet.</span></td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+</div>

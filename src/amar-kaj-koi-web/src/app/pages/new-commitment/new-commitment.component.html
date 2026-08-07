@@ -1,0 +1,112 @@
+<div class="container-page">
+  <h1>New Commitment</h1>
+  <p-card styleClass="form-card" [formGroup]="form">
+    <div class="field">
+      <label>Task Name *</label>
+      <input pInputText formControlName="taskName" />
+    </div>
+    <div class="field">
+      <label>Description</label>
+      <textarea pTextarea formControlName="description" rows="3"></textarea>
+    </div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Task Center</label>
+        <p-select
+          formControlName="taskCenterId"
+          [options]="centerOptions()"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Select"
+          [showClear]="true"
+          styleClass="w-full"
+        ></p-select>
+      </div>
+      <div class="field">
+        <label>Event Channel</label>
+        <p-select
+          formControlName="eventChannelId"
+          [options]="channelOptions()"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Select"
+          [showClear]="true"
+          (onChange)="onChannel($event.value)"
+          styleClass="w-full"
+        ></p-select>
+      </div>
+      <div class="field">
+        <label>Day Event</label>
+        <p-select
+          formControlName="dayEventId"
+          [options]="dayOptions()"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Select"
+          [showClear]="true"
+          styleClass="w-full"
+        ></p-select>
+      </div>
+      <div class="field">
+        <label>Due Date</label>
+        <p-datePicker
+          formControlName="dueDate"
+          dateFormat="yy-mm-dd"
+          [showIcon]="true"
+          [minDate]="today"
+          styleClass="w-full"
+        ></p-datePicker>
+      </div>
+    </div>
+
+    <h2>Optional Voice Commitment</h2>
+    <!-- FR-01: the voice is optional, but a take under 3 seconds never becomes a
+    voiceFileId — it holds the buttons shut until re-recorded or removed. -->
+    <app-voice-recorder
+      purpose="CommitmentVoice"
+      (uploadedChange)="voiceFileId.set($event?.voiceFileId ?? null)"
+      (blockedChange)="voiceBlocked.set($event)"
+    ></app-voice-recorder>
+
+    <p-divider></p-divider>
+
+    <div class="row">
+      <p-button
+        label="Save as Draft"
+        icon="pi pi-save"
+        severity="secondary"
+        [outlined]="true"
+        [loading]="savingDraft()"
+        [disabled]="form.invalid || voiceBlocked() || savingPost()"
+        (onClick)="save(false)"
+      ></p-button>
+
+      <p-button
+        label="Post for Approval"
+        icon="pi pi-send"
+        severity="success"
+        [loading]="savingPost()"
+        [disabled]="form.invalid || voiceBlocked() || savingDraft()"
+        (onClick)="save(true)"
+      ></p-button>
+    </div>
+
+    @if (voiceBlocked()) {
+      <small class="p-error" style="display: block; margin-top: 8px">
+        Finish a voice recording of at least 3 seconds, or remove it, to enable Save Draft or Post.
+      </small>
+    }
+    @if (form.invalid && !voiceBlocked()) {
+      <small class="muted" style="display: block; margin-top: 8px">
+        <i class="pi pi-info-circle"></i>
+        Enter a Task Name to enable Save Draft or Post.
+      </small>
+    }
+    @if (form.valid && !voiceBlocked()) {
+      <small class="muted" style="display: block; margin-top: 8px">
+        <b>Save as Draft:</b> stays private, you can edit or delete it later &nbsp;·&nbsp;
+        <b>Post for Approval:</b> sends to Top Management for approval.
+      </small>
+    }
+  </p-card>
+</div>

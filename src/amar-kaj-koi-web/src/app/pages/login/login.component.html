@@ -1,0 +1,46 @@
+<div class="login-page">
+  <p-card styleClass="login-card">
+    <ng-template pTemplate="title">
+      <div class="brand">Amar Kaj Koi</div>
+    </ng-template>
+    <ng-template pTemplate="subtitle">
+      <span class="muted">Voice + Form based Task Management</span>
+    </ng-template>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="field">
+        <label for="u">Username</label>
+        <input pInputText id="u" formControlName="username" autocomplete="username" autofocus />
+      </div>
+      <div class="field">
+        <label for="p">Password</label>
+        <p-password
+          id="p"
+          formControlName="password"
+          [feedback]="false"
+          [toggleMask]="true"
+          inputStyleClass="w-full"
+          styleClass="w-full"
+        ></p-password>
+      </div>
+      <p-button
+        type="submit"
+        label="Sign In"
+        icon="pi pi-sign-in"
+        [loading]="submitting()"
+        [disabled]="form.invalid"
+        styleClass="w-full"
+      ></p-button>
+    </form>
+
+    <div class="samples muted">
+      <p>Sample users:</p>
+      <ul>
+        <li>manager / Manager&#64;123 (Top Management)</li>
+        <li>employee / Employee&#64;123 (Employee)</li>
+        <li>reviewer / Reviewer&#64;123 (Voice Reviewer)</li>
+        <li>admin / Admin&#64;123 (System Admin)</li>
+      </ul>
+    </div>
+  </p-card>
+</div>

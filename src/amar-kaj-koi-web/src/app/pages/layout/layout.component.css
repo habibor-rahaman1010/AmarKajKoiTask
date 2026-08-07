@@ -1,0 +1,158 @@
+/* The shell owns the viewport height so the page itself never scrolls; without
+   this the body grows with the content and drags the sidebar out of view. */
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.topbar {
+  flex: none;
+}
+
+.layout-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.main-area {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.main-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.sidebar {
+  background: var(--p-surface-950, #0f172a);
+  color: #eef;
+  padding: 16px;
+  /* A long role menu has to scroll inside the rail, not stretch it. */
+  overflow-y: auto;
+  flex: none;
+}
+.brand {
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  align-items: center;
+  gap: 8px;
+}
+.brand i {
+  color: #22c55e;
+}
+
+:host ::ng-deep .side-menu {
+  border: none;
+  background: transparent;
+  width: 100%;
+  flex: 1;
+  --p-menu-background: transparent;
+  --p-menu-item-color: #cbd5e1;
+  --p-menu-item-icon-color: #22c55e;
+  --p-menu-item-focus-background: rgba(34, 197, 94, 0.12);
+  --p-menu-item-focus-color: #22c55e;
+  --p-menu-item-icon-focus-color: #22c55e;
+}
+:host ::ng-deep .side-menu .p-menu-list {
+  padding: 0;
+}
+:host ::ng-deep .side-menu a,
+:host ::ng-deep .side-menu a:hover,
+:host ::ng-deep .side-menu a:focus,
+:host ::ng-deep .side-menu a:visited {
+  text-decoration: none !important;
+}
+:host ::ng-deep .side-menu .p-menuitem-link,
+:host ::ng-deep .side-menu .p-menu-item-link {
+  color: #cbd5e1 !important;
+  border-radius: 6px;
+  padding: 10px 12px;
+  text-decoration: none !important;
+}
+:host ::ng-deep .side-menu .p-menuitem-link:hover,
+:host ::ng-deep .side-menu .p-menu-item-link:hover,
+:host ::ng-deep .side-menu .p-menuitem-link:focus,
+:host ::ng-deep .side-menu .p-menu-item-link:focus {
+  background: rgba(34, 197, 94, 0.12) !important;
+  color: #22c55e !important;
+  text-decoration: none !important;
+}
+:host ::ng-deep .side-menu .p-menuitem-link:hover .pi,
+:host ::ng-deep .side-menu .p-menu-item-link:hover .pi {
+  color: #22c55e !important;
+}
+:host ::ng-deep .side-menu .p-menuitem-icon,
+:host ::ng-deep .side-menu .p-menu-item-icon,
+:host ::ng-deep .side-menu .p-menuitem-link .pi,
+:host ::ng-deep .side-menu .p-menu-item-link .pi {
+  color: #22c55e !important;
+}
+
+/* Unread count sits at the right edge of the Notifications row. */
+:host ::ng-deep .side-menu .notif-badge {
+  background: var(--p-red-500, #ef4444);
+  color: #fff;
+  min-width: 20px;
+  height: 20px;
+  line-height: 20px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 0 6px;
+}
+
+.user-card {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 14px;
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+:host ::ng-deep .avatar {
+  background: var(--p-primary-500, #6366f1);
+  color: #fff;
+}
+.user-info {
+  flex: 1;
+  min-width: 0;
+}
+.user-name {
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+:host ::ng-deep .role-tag {
+  margin-top: 4px;
+}
+
+.offline-strip {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  font-size: 13px;
+  background: var(--p-amber-100, #fef3c7);
+  color: var(--p-amber-900, #78350f);
+  border-bottom: 1px solid var(--p-amber-300, #fcd34d);
+}
+
+/* Note: mobile-drawer skin lives in global styles.css because PrimeNG Drawer
+ renders as a direct child of <body>, outside this component's view. */

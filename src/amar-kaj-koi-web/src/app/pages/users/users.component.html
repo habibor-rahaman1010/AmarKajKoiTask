@@ -1,0 +1,62 @@
+<div class="container-page">
+  <h1>Users</h1>
+
+  <p-card header="Add User" styleClass="mb-3">
+    <div class="user-form" [formGroup]="form">
+      <div class="field">
+        <label>Full Name</label><input pInputText formControlName="fullName" />
+      </div>
+      <div class="field">
+        <label>Username</label><input pInputText formControlName="username" />
+      </div>
+      <div class="field"><label>Email</label><input pInputText formControlName="email" /></div>
+      <div class="field">
+        <label>Password</label><input pInputText formControlName="password" type="text" />
+      </div>
+      <div class="field">
+        <label>Role</label>
+        <p-select
+          formControlName="roleName"
+          [options]="roleOptions"
+          optionLabel="label"
+          optionValue="value"
+          styleClass="w-full"
+        ></p-select>
+      </div>
+      <div style="align-self: end">
+        <p-button
+          label="Create User"
+          icon="pi pi-user-plus"
+          [disabled]="form.invalid"
+          (onClick)="save()"
+        ></p-button>
+      </div>
+    </div>
+  </p-card>
+
+  <p-card header="All Users">
+    <p-table
+      [value]="users()"
+      [rowHover]="true"
+      [paginator]="true"
+      [rows]="10"
+      [rowsPerPageOptions]="[10, 20, 50]"
+      styleClass="p-datatable-sm"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Name</th>
+          <th>Username</th>
+          <th>Role</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-u>
+        <tr>
+          <td>{{ u.fullName }}</td>
+          <td>{{ u.username }}</td>
+          <td><p-tag [value]="u.roleName" [severity]="roleSeverity(u.roleName)"></p-tag></td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+</div>

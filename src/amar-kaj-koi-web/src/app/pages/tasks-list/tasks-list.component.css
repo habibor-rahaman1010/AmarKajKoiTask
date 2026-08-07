@@ -1,0 +1,37 @@
+.filters {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  align-items: end;
+}
+
+@media (min-width: 640px) {
+  .filters {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (min-width: 1024px) {
+  .filters {
+    grid-template-columns: 2fr 1fr 1fr 1fr auto;
+  }
+}
+
+.bulk-bar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+  padding: 10px;
+  background: var(--p-yellow-50, #fef3c7);
+  border-radius: 6px;
+}
+
+.mb-3 {
+  margin-bottom: 16px;
+}
+
+.w-full {
+  width: 100%;
+}

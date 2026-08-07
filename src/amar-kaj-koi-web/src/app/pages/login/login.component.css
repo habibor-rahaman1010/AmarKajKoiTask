@@ -1,0 +1,39 @@
+:host ::ng-deep .p-card.login-card {
+  max-width: 420px;
+  width: 100%;
+}
+
+:host ::ng-deep .p-card.login-card .brand {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--p-primary-color);
+}
+
+:host ::ng-deep .p-card.login-card .p-password input {
+  width: 100%;
+}
+
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--p-primary-500, #6366f1), var(--p-primary-700, #4338ca));
+  padding: 20px;
+}
+
+.samples {
+  font-size: 12px;
+  margin-top: 20px;
+  padding-top: 12px;
+  border-top: 1px solid var(--p-surface-border, #e5e7eb);
+}
+
+.samples ul {
+  padding-left: 18px;
+  margin: 4px 0;
+}
+
+.w-full {
+  width: 100%;
+}

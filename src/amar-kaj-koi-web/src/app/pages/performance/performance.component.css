@@ -1,0 +1,31 @@
+.stat {
+  text-align: center;
+  padding: 8px;
+}
+
+.lbl {
+  text-transform: uppercase;
+  font-size: 12px;
+  color: var(--p-text-muted-color);
+}
+
+.num {
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.num.info {
+  color: var(--p-primary-600, #4f46e5);
+}
+
+.num.success {
+  color: #059669;
+}
+
+.num.warn {
+  color: #dc2626;
+}
+
+.mt-2 {
+  margin-top: 8px;
+}

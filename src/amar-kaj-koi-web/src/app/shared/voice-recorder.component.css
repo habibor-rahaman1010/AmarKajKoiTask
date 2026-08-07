@@ -1,0 +1,16 @@
+.voice-box {
+  padding: 12px;
+  background: var(--p-surface-100, #f1f5f9);
+  border-radius: 8px;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+audio {
+  max-width: 250px;
+}

@@ -1,0 +1,69 @@
+<div class="container-page">
+  <h1>Pending Commitment Approvals</h1>
+
+  <p-card>
+    <p-table
+      [value]="pending()"
+      [loading]="loading()"
+      [rowHover]="true"
+      styleClass="p-datatable-sm"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Task</th>
+          <th>By</th>
+          <th>Due</th>
+          <th>Assign to</th>
+          <th style="min-width: 250px"></th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-t>
+        <tr>
+          <td>
+            <a [routerLink]="['/tasks', t.taskId]">{{ t.taskName }}</a>
+          </td>
+          <td>{{ t.createdByName }}</td>
+          <td>{{ t.dueDate ? (t.dueDate | date: 'mediumDate') : '—' }}</td>
+          <td>
+            <p-select
+              [formControl]="assignForm.controls[t.taskId]"
+              [options]="employeeOptions()"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Keep creator"
+              [showClear]="true"
+              styleClass="w-full"
+            ></p-select>
+          </td>
+          <td>
+            <div class="row">
+              <p-button
+                icon="pi pi-check"
+                label="Approve"
+                severity="success"
+                (onClick)="approve(t.taskId)"
+              ></p-button>
+              <p-button
+                icon="pi pi-reply"
+                label="Send Back"
+                severity="warn"
+                (onClick)="sendBack(t.taskId)"
+              ></p-button>
+              <p-button
+                icon="pi pi-times"
+                label="Reject"
+                severity="danger"
+                (onClick)="reject(t.taskId)"
+              ></p-button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="5"><span class="muted">Nothing pending.</span></td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+</div>

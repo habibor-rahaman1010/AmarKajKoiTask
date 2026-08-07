@@ -1,0 +1,328 @@
+@layer tailwind-base, primeng, tailwind-utilities;
+
+@import 'tailwindcss/theme.css' layer(tailwind-base);
+@import 'tailwindcss/preflight.css' layer(tailwind-base);
+@import 'tailwindcss/utilities.css' layer(tailwind-utilities);
+@import 'primeicons/primeicons.css';
+
+/* Baseline resets */
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+}
+
+body {
+  background: var(--p-surface-50, #f8fafc);
+  color: var(--p-text-color, #1e1e2f);
+}
+
+/* Layout helpers (mobile-first) */
+.container-page {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 12px;
+}
+
+@media (min-width: 640px) {
+  .container-page {
+    padding: 16px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container-page {
+    padding: 20px;
+  }
+}
+
+.grid-2 {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+  .grid-2 {
+    gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+@media (min-width: 640px) {
+  .row {
+    gap: 10px;
+  }
+}
+
+.between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+@media (min-width: 640px) {
+  .between {
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: nowrap;
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.field label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--p-text-muted-color);
+}
+
+.field input,
+.field textarea,
+.field .p-select,
+.field .p-datepicker,
+.field p-select,
+.field p-datepicker {
+  width: 100%;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.muted {
+  color: var(--p-text-muted-color, #64748b);
+}
+
+.small {
+  font-size: 12px;
+}
+
+h1 {
+  margin: 0 0 12px 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+h2 {
+  margin: 0 0 10px 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+@media (min-width: 640px) {
+  h1 {
+    margin: 0 0 20px 0;
+    font-size: 22px;
+  }
+
+  h2 {
+    margin: 0 0 12px 0;
+    font-size: 16px;
+  }
+}
+
+p {
+  margin: 0 0 10px 0;
+}
+
+ul {
+  padding-left: 20px;
+  margin: 4px 0;
+}
+
+a {
+  color: var(--p-primary-color, #6366f1);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* Tables overflow on mobile */
+.p-datatable-wrapper,
+.p-datatable-table-container {
+  overflow-x: auto;
+}
+
+/* Mobile drawer — matches desktop sidebar (dark navy) */
+.mobile-drawer.p-drawer,
+.mobile-drawer .p-drawer-header,
+.mobile-drawer .p-drawer-content {
+  background: #0f172a !important;
+  color: #eef !important;
+  border: none !important;
+}
+
+.mobile-drawer .p-drawer-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  padding: 16px !important;
+}
+
+.mobile-drawer .p-drawer-header .p-drawer-close-button,
+.mobile-drawer .p-drawer-header button {
+  color: #cbd5e1 !important;
+}
+
+.mobile-drawer .p-drawer-header .p-drawer-close-button:hover,
+.mobile-drawer .p-drawer-header button:hover {
+  color: #fff !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+.mobile-drawer .p-drawer-content {
+  display: flex;
+  flex-direction: column;
+  padding: 12px !important;
+}
+
+/* Menu inside drawer (same green theme as desktop sidebar) */
+.mobile-drawer .side-menu {
+  border: none !important;
+  background: transparent !important;
+  width: 100%;
+  --p-menu-background: transparent;
+  --p-menu-item-color: #cbd5e1;
+  --p-menu-item-icon-color: #22c55e;
+  --p-menu-item-focus-background: rgba(34, 197, 94, 0.12);
+  --p-menu-item-focus-color: #22c55e;
+  --p-menu-item-icon-focus-color: #22c55e;
+}
+
+.mobile-drawer .side-menu .p-menu-list {
+  padding: 0 !important;
+}
+
+.mobile-drawer .side-menu a,
+.mobile-drawer .side-menu a:hover,
+.mobile-drawer .side-menu a:focus,
+.mobile-drawer .side-menu a:visited {
+  text-decoration: none !important;
+}
+
+.mobile-drawer .side-menu .p-menuitem-link,
+.mobile-drawer .side-menu .p-menu-item-link {
+  color: #cbd5e1 !important;
+  border-radius: 6px;
+  padding: 10px 12px;
+  text-decoration: none !important;
+}
+
+.mobile-drawer .side-menu .p-menuitem-link:hover,
+.mobile-drawer .side-menu .p-menu-item-link:hover,
+.mobile-drawer .side-menu .p-menuitem-link:focus,
+.mobile-drawer .side-menu .p-menu-item-link:focus {
+  background: rgba(34, 197, 94, 0.12) !important;
+  color: #22c55e !important;
+  text-decoration: none !important;
+}
+
+.mobile-drawer .side-menu .p-menuitem-link:hover .pi,
+.mobile-drawer .side-menu .p-menu-item-link:hover .pi {
+  color: #22c55e !important;
+}
+
+.mobile-drawer .side-menu .p-menuitem-icon,
+.mobile-drawer .side-menu .p-menu-item-icon,
+.mobile-drawer .side-menu .p-menuitem-link .pi,
+.mobile-drawer .side-menu .p-menu-item-link .pi {
+  color: #22c55e !important;
+}
+
+/* User card inside drawer */
+.mobile-drawer .user-card {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 14px;
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mobile-drawer .user-card .user-name {
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* Task status badges */
+.status-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.status-Draft {
+  background: #e2e8f0;
+  color: #334155;
+}
+
+.status-PendingManagementApproval {
+  background: #fef3c7;
+  color: #78350f;
+}
+
+.status-PendingVoiceReview {
+  background: #dbeafe;
+  color: #1e3a8a;
+}
+
+.status-Open {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.status-RequestToExtendRevise {
+  background: #fed7aa;
+  color: #7c2d12;
+}
+
+.status-Overdue {
+  background: #fecaca;
+  color: #7f1d1d;
+}
+
+.status-Passed {
+  background: #bbf7d0;
+  color: #14532d;
+}
+
+.status-Failed {
+  background: #fda4af;
+  color: #7f1d1d;
+}
+
+.status-Cancelled {
+  background: #e5e7eb;
+  color: #374151;
+}

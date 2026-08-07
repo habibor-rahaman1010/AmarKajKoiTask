@@ -1,0 +1,80 @@
+<div class="voice-box">
+  <div class="controls">
+    @if (!recording() && !recordedBlob()) {
+      <p-button
+        icon="pi pi-microphone"
+        label="Record"
+        severity="danger"
+        (onClick)="start()"
+      ></p-button>
+    }
+
+    @if (recording()) {
+      <p-button
+        [icon]="'pi pi-stop-circle'"
+        [label]="'Stop (' + elapsed() + 's)'"
+        severity="danger"
+        (onClick)="stop()"
+      ></p-button>
+    }
+
+    <!-- FR-02: after recording the user only plays it back or re-records.
+    Storing the audio happens on its own; Save as Draft / Post live on the page. -->
+    @if (recordedBlob()) {
+      <audio [src]="recordedUrl()!" controls></audio>
+      @if (uploading()) {
+        <p-tag severity="info" [value]="'Saving voice…'" icon="pi pi-spin pi-spinner"></p-tag>
+      }
+      @if (uploaded()) {
+        <p-tag
+          severity="success"
+          [value]="'Voice ready (' + elapsed() + 's)'"
+          icon="pi pi-check"
+        ></p-tag>
+      }
+      <!-- FR-38: recorded offline, waiting to sync -->
+      @if (queued()) {
+        <p-tag
+          severity="warn"
+          [value]="'Saved offline (' + elapsed() + 's) — will sync'"
+          icon="pi pi-cloud-upload"
+        ></p-tag>
+      }
+      @if (failed()) {
+        <p-tag
+          severity="danger"
+          value="Could not save voice"
+          icon="pi pi-exclamation-triangle"
+        ></p-tag>
+      }
+      @if (failed()) {
+        <p-button
+          icon="pi pi-replay"
+          label="Try again"
+          severity="warn"
+          (onClick)="upload()"
+        ></p-button>
+      }
+      <p-button
+        icon="pi pi-refresh"
+        label="Re-record"
+        severity="secondary"
+        [disabled]="uploading()"
+        (onClick)="reset()"
+      ></p-button>
+    }
+  </div>
+
+  @if (!recording() && !recordedBlob()) {
+    <small class="muted">Click Record. Minimum 3 seconds.</small>
+  }
+  @if (recordedBlob() && elapsed() < 3) {
+    <small class="p-error">Recording is under 3 seconds. Please re-record.</small>
+  }
+  @if (queued()) {
+    <small class="muted">
+      This recording is stored on your device. It uploads by itself once you are back online, and
+      the form can be submitted after that.
+    </small>
+  }
+</div>

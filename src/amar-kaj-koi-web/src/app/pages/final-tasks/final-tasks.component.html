@@ -1,0 +1,99 @@
+<div class="container-page">
+  <h1>Passed / Failed / Cancelled Tasks</h1>
+
+  <div class="grid-2" style="margin-bottom: 16px">
+    <p-card>
+      <div style="text-align: center">
+        <div class="muted small">Passed</div>
+        <div style="font-size: 28px; font-weight: 700; color: #059669">{{ counts().passed }}</div>
+      </div>
+    </p-card>
+    <p-card>
+      <div style="text-align: center">
+        <div class="muted small">Failed</div>
+        <div style="font-size: 28px; font-weight: 700; color: #dc2626">{{ counts().failed }}</div>
+      </div>
+    </p-card>
+    <p-card>
+      <div style="text-align: center">
+        <div class="muted small">Cancelled</div>
+        <div style="font-size: 28px; font-weight: 700; color: #64748b">
+          {{ counts().cancelled }}
+        </div>
+      </div>
+    </p-card>
+    <p-card>
+      <div style="text-align: center">
+        <div class="muted small">Total finished</div>
+        <div style="font-size: 28px; font-weight: 700">
+          {{ counts().passed + counts().failed + counts().cancelled }}
+        </div>
+      </div>
+    </p-card>
+  </div>
+
+  <p-card>
+    <div class="between">
+      <div class="row">
+        <p-select
+          [formControl]="filterStatus"
+          [options]="filterOptions"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="All"
+          [showClear]="true"
+          (onChange)="reload()"
+          styleClass="w-64"
+        ></p-select>
+      </div>
+      <div class="muted small">Showing {{ rows().length }} tasks</div>
+    </div>
+
+    <p-table
+      [value]="rows()"
+      [loading]="loading()"
+      [rowHover]="true"
+      [paginator]="true"
+      [rows]="15"
+      styleClass="p-datatable-sm"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Task</th>
+          <th>Type</th>
+          <th>Assignee</th>
+          <th>Due</th>
+          <th>Status</th>
+          <th>Final Comment</th>
+          <th></th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-t>
+        <tr>
+          <td>{{ t.taskName }}</td>
+          <td>{{ t.taskType }}</td>
+          <td>{{ t.assignedToName || '—' }}</td>
+          <td>{{ t.dueDate ? (t.dueDate | date: 'mediumDate') : '—' }}</td>
+          <td>
+            <span class="status-badge status-{{ t.statusCode }}">{{ t.statusName }}</span>
+          </td>
+          <td class="muted small">{{ t.finalComment || '—' }}</td>
+          <td>
+            <p-button
+              icon="pi pi-external-link"
+              severity="secondary"
+              [text]="true"
+              [rounded]="true"
+              [routerLink]="['/tasks', t.taskId]"
+            ></p-button>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="7"><span class="muted">No finished tasks yet.</span></td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+</div>

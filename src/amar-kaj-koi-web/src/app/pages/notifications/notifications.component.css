@@ -1,0 +1,11 @@
+:host ::ng-deep .notif.unread {
+  border-left: 3px solid var(--p-primary-500);
+}
+
+.mb-2 {
+  margin-bottom: 10px;
+}
+
+.ml-2 {
+  margin-left: 6px;
+}

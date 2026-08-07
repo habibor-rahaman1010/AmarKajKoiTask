@@ -1,0 +1,85 @@
+<div class="container-page">
+  <h1>Event-wise Task List</h1>
+  <p class="muted">Tasks grouped by Event Channel.</p>
+
+  @if (loading()) {
+    <p-card><span class="muted">Loading…</span></p-card>
+  }
+
+  @for (group of pagedGroups(); track group.channel) {
+    <p-card styleClass="mb-3">
+      <ng-template pTemplate="header">
+        <div
+          style="
+            padding: 14px 18px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          "
+        >
+          <h2 style="margin: 0">
+            <i class="pi pi-calendar" style="color: #22c55e; margin-right: 6px"></i>
+            {{ group.channel }}
+          </h2>
+          <p-tag [value]="group.tasks.length + ' tasks'" severity="info"></p-tag>
+        </div>
+      </ng-template>
+      <p-table
+        [value]="group.tasks"
+        [rowHover]="true"
+        [paginator]="true"
+        [rows]="10"
+        [rowsPerPageOptions]="[10, 20, 50]"
+        [alwaysShowPaginator]="false"
+        styleClass="p-datatable-sm"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Task</th>
+            <th>Day Event</th>
+            <th>Assignee</th>
+            <th>Due</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-t>
+          <tr>
+            <td>{{ t.taskName }}</td>
+            <td>{{ t.dayEvent || '—' }}</td>
+            <td>{{ t.assignedToName || '—' }}</td>
+            <td>{{ t.dueDate ? (t.dueDate | date: 'mediumDate') : '—' }}</td>
+            <td>
+              <span class="status-badge status-{{ t.statusCode }}">{{ t.statusName }}</span>
+            </td>
+            <td>
+              <p-button
+                icon="pi pi-external-link"
+                severity="secondary"
+                [text]="true"
+                [rounded]="true"
+                [routerLink]="['/tasks', t.taskId]"
+              ></p-button>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </p-card>
+  }
+
+  @if (showPaginator()) {
+    <p-paginator
+      [first]="first()"
+      [rows]="rows()"
+      [totalRecords]="groups().length"
+      [rowsPerPageOptions]="rowsPerPageOptions"
+      (onPageChange)="onPage($event)"
+    ></p-paginator>
+  }
+
+  @if (!loading() && !groups().length) {
+    <p-card>
+      <span class="muted">No event-wise tasks yet.</span>
+    </p-card>
+  }
+</div>
