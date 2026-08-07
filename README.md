@@ -79,13 +79,8 @@ ng version           # Angular CLI 20.x
 ### ধাপ ১ — Clone করুন
 
 ```bash
-<<<<<<< HEAD
 git clone https://github.com/habibor-rahaman1010/AmarKajKoiTask/tree/developer
 cd AmarKajKoiTask
-=======
-git clone <your-repository-url>
-cd MultiTechSystem
->>>>>>> 6ba68304add873dad179ac667faaaf069ac3708a
 ```
 
 ---
