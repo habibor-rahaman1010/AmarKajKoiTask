@@ -30,7 +30,9 @@ export class RealtimeService {
   public readonly changed$ = new Subject<number>();
 
   public async start(): Promise<void> {
-    if (this.connection || !this.auth.token()) return;
+    if (this.connection || !this.auth.token()) {
+      return;
+    }
 
     const conn = new HubConnectionBuilder()
       .withUrl(`${environment.hubUrl}/notifications`, {

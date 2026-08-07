@@ -27,7 +27,10 @@ namespace AmarKajKoi.Controllers
         public async Task<IActionResult> Download(Guid voiceFileId)
         {
             var r = await _voice.DownloadAsync(voiceFileId);
-            if (r == null) return NotFound();
+            if (r == null)
+            {
+                return NotFound();
+            }
             // No download file name: passing one sets Content-Disposition: attachment,
             // which makes the browser save the clip instead of playing it. Range
             // processing lets a player seek without refetching the whole file.

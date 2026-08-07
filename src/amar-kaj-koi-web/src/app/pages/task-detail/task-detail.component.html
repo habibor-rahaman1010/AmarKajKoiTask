@@ -1,389 +1,259 @@
 @if (task(); as t) {
-  <div class="container-page">
-    <a routerLink="/tasks" class="muted"><i class="pi pi-arrow-left"></i> Back to tasks</a>
-    <div class="between" style="margin-top: 12px">
-      <h1 style="margin: 0">
-        {{ t.taskName }}
-        <span class="status-badge status-{{ t.statusCode }}" style="margin-left: 10px">{{
-          t.statusName
+<div class="container-page">
+  <a routerLink="/tasks" class="muted"><i class="pi pi-arrow-left"></i> Back to tasks</a>
+  <div class="between" style="margin-top: 12px">
+    <h1 style="margin: 0">
+      {{ t.taskName }}
+      <span class="status-badge status-{{ t.statusCode }}" style="margin-left: 10px">{{
+        t.statusName
         }}</span>
-        @if (t.isPinned) {
-          <i class="pi pi-bookmark-fill" style="color: var(--p-orange-500); margin-left: 8px"></i>
+      @if (t.isPinned) {
+      <i class="pi pi-bookmark-fill" style="color: var(--p-orange-500); margin-left: 8px"></i>
+      }
+    </h1>
+  </div>
+  <div class="detail-layout">
+    <div>
+      <p-card header="Details" styleClass="mb-3">
+        <div class="detail-grid">
+          <div><b>Type:</b> {{ t.taskType }}</div>
+          <div><b>Task Center:</b> {{ t.taskCenter || '—' }}</div>
+          <div><b>Event Channel:</b> {{ t.eventChannel || '—' }}</div>
+          <div><b>Day Event:</b> {{ t.dayEvent || '—' }}</div>
+          <div><b>Assigned To:</b> {{ t.assignedToName || '—' }}</div>
+          <div><b>Created By:</b> {{ t.createdByName }}</div>
+          <div><b>Due Date:</b> {{ t.dueDate ? (t.dueDate | date: 'mediumDate') : '—' }}</div>
+          <div><b>Requests:</b> {{ t.requestCount }} of 3</div>
+          <div><b>Created:</b> {{ t.createdAt | date: 'medium' }}</div>
+        </div>
+        @if (t.description || t.voiceFileId || t.finalComment) {
+        <p-divider></p-divider>
         }
-      </h1>
-    </div>
-    <div class="detail-layout">
-      <div>
-        <p-card header="Details" styleClass="mb-3">
-          <div class="detail-grid">
-            <div><b>Type:</b> {{ t.taskType }}</div>
-            <div><b>Task Center:</b> {{ t.taskCenter || '—' }}</div>
-            <div><b>Event Channel:</b> {{ t.eventChannel || '—' }}</div>
-            <div><b>Day Event:</b> {{ t.dayEvent || '—' }}</div>
-            <div><b>Assigned To:</b> {{ t.assignedToName || '—' }}</div>
-            <div><b>Created By:</b> {{ t.createdByName }}</div>
-            <div><b>Due Date:</b> {{ t.dueDate ? (t.dueDate | date: 'mediumDate') : '—' }}</div>
-            <div><b>Requests:</b> {{ t.requestCount }} of 3</div>
-            <div><b>Created:</b> {{ t.createdAt | date: 'medium' }}</div>
+        @if (t.description) {
+        <div>
+          <b>Description:</b>
+          <p style="margin: 4px 0">{{ t.description }}</p>
+        </div>
+        }
+        @if (t.voiceFileId) {
+        <div style="margin-top: 8px">
+          <b>Voice:</b>
+          <app-voice-player [voiceFileId]="t.voiceFileId" style="margin-top: 6px"></app-voice-player>
+        </div>
+        }
+        @if (t.finalComment) {
+        <div><b>Final comment:</b> {{ t.finalComment }}</div>
+        }
+      </p-card>
+      <p-card header="Actions" styleClass="mb-3">
+        <!-- FR-03 / FR-08: creator can edit Draft (any task) or Pending-Approval commitment -->
+        @if (canEdit()) {
+        <div class="row" style="margin-bottom: 8px">
+          <p-button label="Edit" icon="pi pi-pencil" severity="secondary" [outlined]="true"
+            (onClick)="openEditDialog()"></p-button>
+        </div>
+        }
+        <!-- Employee posting draft -->
+        @if (canPost()) {
+        <div class="row">
+          <p-button label="Post" icon="pi pi-send" severity="success" (onClick)="post()"></p-button>
+          <p-button label="Delete Draft" icon="pi pi-trash" severity="danger" (onClick)="deleteDraft()"></p-button>
+        </div>
+        }
+        <!-- Management: approve/reject/send back -->
+        @if (t.statusCode === 'PendingManagementApproval' && role === 'TopManagement') {
+        <div>
+          <div class="field">
+            <label>Assign to (optional; defaults to creator)</label>
+            <p-select [formControl]="assigneeId" [options]="employeeOptions()" optionLabel="label" optionValue="value"
+              placeholder="Keep as is" [showClear]="true" styleClass="w-full"></p-select>
           </div>
-          @if (t.description || t.voiceFileId || t.finalComment) {
-            <p-divider></p-divider>
+          <div class="row">
+            <p-button label="Approve → Open" icon="pi pi-check" severity="success" (onClick)="approve()"></p-button>
+            <p-button label="Send Back" icon="pi pi-reply" severity="warn" (onClick)="sendBack()"></p-button>
+            <p-button label="Reject" icon="pi pi-times" severity="danger" (onClick)="reject()"></p-button>
+          </div>
+        </div>
+        }
+        <!-- Voice reviewer -->
+        @if (t.statusCode === 'PendingVoiceReview' && role === 'VoiceReviewer') {
+        <div>
+          <p class="muted">Fill required fields, then Save & Open Task.</p>
+          <p-button label="Go to Voice Review" routerLink="/voice-review" icon="pi pi-headphones"></p-button>
+        </div>
+        }
+        <!-- Assignee: extend / mark passed -->
+        @if (isAssignee() && (t.statusCode === 'Open' || t.statusCode === 'Overdue')) {
+        <div>
+          <div class="row">
+            <p-button [label]="'Request Extend/Revise (' + (3 - t.requestCount) + ' left)'" icon="pi pi-hourglass"
+              (onClick)="showExtend.set(true)" [disabled]="t.requestCount >= 3"></p-button>
+            <p-button label="Request Mark as Passed" icon="pi pi-check-circle" severity="success"
+              [disabled]="!!pendingMarkPassedRequest()" (onClick)="requestPassed()"></p-button>
+          </div>
+          @if (pendingMarkPassedRequest()) {
+          <small class="muted">
+            Your Mark as Passed request is waiting for a management decision.
+          </small>
           }
-          @if (t.description) {
-            <div>
-              <b>Description:</b>
-              <p style="margin: 4px 0">{{ t.description }}</p>
+        </div>
+        }
+        @if (isAssignee() && t.statusCode === 'Open' && !t.voiceFileId) {
+        <div style="margin-top: 12px">
+          <h2>Add Voice Commitment (optional)</h2>
+          <app-voice-recorder purpose="CommitmentVoice" (uploadedChange)="attachVoice($event)"></app-voice-recorder>
+        </div>
+        }
+        <!-- Management change due date / assignee / pin / final -->
+        @if (
+        role === 'TopManagement' &&
+        ['Open', 'Overdue', 'RequestToExtendRevise'].includes(t.statusCode)
+        ) {
+        <div>
+          <p-divider></p-divider>
+          <div class="row">
+            <div class="field" style="min-width: 200px">
+              <label>Change Due Date</label>
+              <!-- FR-31 -->
+              <p-datePicker [formControl]="newDueDate" dateFormat="yy-mm-dd" [showIcon]="true"
+                [minDate]="today"></p-datePicker>
             </div>
-          }
-          @if (t.voiceFileId) {
-            <div style="margin-top: 8px">
-              <b>Voice:</b>
-              <app-voice-player
-                [voiceFileId]="t.voiceFileId"
-                style="margin-top: 6px"
-              ></app-voice-player>
+            <p-button label="Update Due Date" icon="pi pi-calendar" [disabled]="!newDueDate.value"
+              (onClick)="changeDue()"></p-button>
+          </div>
+          <div class="row">
+            <div class="field" style="min-width: 220px">
+              <label>Change Assignee</label>
+              <p-select [formControl]="assigneeId" [options]="employeeOptions()" optionLabel="label" optionValue="value"
+                placeholder="Select" styleClass="w-full"></p-select>
             </div>
+            <p-button label="Change Assignee" icon="pi pi-user-edit" [disabled]="!assigneeId.value"
+              (onClick)="changeAssignee()"></p-button>
+          </div>
+          <p-button [label]="t.isPinned ? 'Unpin' : 'Pin'" icon="pi pi-bookmark" severity="secondary"
+            (onClick)="pin()"></p-button>
+          <p-divider></p-divider>
+          <div class="field">
+            <label>Final Comment (optional)</label>
+            <textarea pTextarea [formControl]="finalComment" rows="2"></textarea>
+          </div>
+          <div class="row">
+            <p-button label="Mark Passed" icon="pi pi-check" severity="success"
+              (onClick)="markFinal('Passed')"></p-button>
+            <p-button label="Mark Failed" icon="pi pi-times" severity="danger"
+              (onClick)="markFinal('Failed')"></p-button>
+            <p-button label="Cancel" icon="pi pi-ban" severity="secondary"
+              (onClick)="markFinal('Cancelled')"></p-button>
+          </div>
+        </div>
+        }
+        <!-- FR-23: Extend / Revise decision inline -->
+        @if (role === 'TopManagement' && pendingExtendRequest(); as r) {
+        <div>
+          <p-divider></p-divider>
+          <h2>Pending Extend/Revise Request</h2>
+          <p>
+            <b>{{ r.requestType }}</b> requested by {{ r.requestedByName }}
+          </p>
+          @if (r.requestedDueDate) {
+          <p>New due: {{ r.requestedDueDate | date: 'mediumDate' }}</p>
           }
-          @if (t.finalComment) {
-            <div><b>Final comment:</b> {{ t.finalComment }}</div>
+          @if (r.reasonText) {
+          <p>Reason: {{ r.reasonText }}</p>
           }
-        </p-card>
-        <p-card header="Actions" styleClass="mb-3">
-          <!-- FR-03 / FR-08: creator can edit Draft (any task) or Pending-Approval commitment -->
-          @if (canEdit()) {
-            <div class="row" style="margin-bottom: 8px">
-              <p-button
-                label="Edit"
-                icon="pi pi-pencil"
-                severity="secondary"
-                [outlined]="true"
-                (onClick)="openEditDialog()"
-              ></p-button>
+          @if (r.voiceFileId) {
+          <app-voice-player [voiceFileId]="r.voiceFileId"></app-voice-player>
+          }
+          <div class="field">
+            <label>Decision reason (required to reject)</label>
+            <textarea pTextarea [formControl]="extendDecisionReason" rows="2"></textarea>
+          </div>
+          <div class="row">
+            <p-button label="Approve" icon="pi pi-check" severity="success"
+              (onClick)="decideExtend(r.requestId, true)"></p-button>
+            <p-button label="Reject" icon="pi pi-times" severity="danger"
+              (onClick)="decideExtend(r.requestId, false)"></p-button>
+          </div>
+        </div>
+        }
+        <!-- FR-26: employee's Mark as Passed request — Approve or Reject only -->
+        @if (role === 'TopManagement' && pendingMarkPassedRequest(); as mp) {
+        <div>
+          <p-divider></p-divider>
+          <h2>Mark as Passed Request</h2>
+          <p>
+            Requested by <b>{{ mp.requestedByName }}</b> on {{ mp.createdAt | date: 'medium' }}
+          </p>
+          @if (mp.reasonText) {
+          <p>Note: {{ mp.reasonText }}</p>
+          }
+          <div class="field">
+            <label>Decision reason (required to reject)</label>
+            <textarea pTextarea [formControl]="markPassedDecisionReason" rows="2"></textarea>
+          </div>
+          <div class="row">
+            <p-button label="Approve → Passed" icon="pi pi-check" severity="success"
+              (onClick)="decideMarkPassed(mp.requestId, true)"></p-button>
+            <p-button label="Reject" icon="pi pi-times" severity="danger"
+              (onClick)="decideMarkPassed(mp.requestId, false)"></p-button>
+          </div>
+        </div>
+        }
+        <!-- System Admin reopen -->
+        @if (
+        role === 'SystemAdmin' && (t.statusCode === 'Failed' || t.statusCode === 'Cancelled')
+        ) {
+        <div>
+          <p-button label="Reopen Task" icon="pi pi-refresh" severity="warn" (onClick)="reopen()"></p-button>
+        </div>
+        }
+      </p-card>
+    </div>
+    <div>
+      <p-card header="Timeline">
+        <p-timeline [value]="t.timeline" align="left" styleClass="timeline-list">
+          <ng-template pTemplate="marker" let-e>
+            <span class="tl-marker"><i class="pi pi-circle-fill"></i></span>
+          </ng-template>
+          <ng-template pTemplate="content" let-e>
+            <div class="tl-title">
+              <b>{{ e.actionType | humanize }}</b> · {{ e.actionByName }}
             </div>
-          }
-          <!-- Employee posting draft -->
-          @if (canPost()) {
-            <div class="row">
-              <p-button
-                label="Post"
-                icon="pi pi-send"
-                severity="success"
-                (onClick)="post()"
-              ></p-button>
-              <p-button
-                label="Delete Draft"
-                icon="pi pi-trash"
-                severity="danger"
-                (onClick)="deleteDraft()"
-              ></p-button>
-            </div>
-          }
-          <!-- Management: approve/reject/send back -->
-          @if (t.statusCode === 'PendingManagementApproval' && role === 'TopManagement') {
-            <div>
-              <div class="field">
-                <label>Assign to (optional; defaults to creator)</label>
-                <p-select
-                  [formControl]="assigneeId"
-                  [options]="employeeOptions()"
-                  optionLabel="label"
-                  optionValue="value"
-                  placeholder="Keep as is"
-                  [showClear]="true"
-                  styleClass="w-full"
-                ></p-select>
-              </div>
-              <div class="row">
-                <p-button
-                  label="Approve → Open"
-                  icon="pi pi-check"
-                  severity="success"
-                  (onClick)="approve()"
-                ></p-button>
-                <p-button
-                  label="Send Back"
-                  icon="pi pi-reply"
-                  severity="warn"
-                  (onClick)="sendBack()"
-                ></p-button>
-                <p-button
-                  label="Reject"
-                  icon="pi pi-times"
-                  severity="danger"
-                  (onClick)="reject()"
-                ></p-button>
-              </div>
-            </div>
-          }
-          <!-- Voice reviewer -->
-          @if (t.statusCode === 'PendingVoiceReview' && role === 'VoiceReviewer') {
-            <div>
-              <p class="muted">Fill required fields, then Save & Open Task.</p>
-              <p-button
-                label="Go to Voice Review"
-                routerLink="/voice-review"
-                icon="pi pi-headphones"
-              ></p-button>
-            </div>
-          }
-          <!-- Assignee: extend / mark passed -->
-          @if (isAssignee() && (t.statusCode === 'Open' || t.statusCode === 'Overdue')) {
-            <div>
-              <div class="row">
-                <p-button
-                  [label]="'Request Extend/Revise (' + (3 - t.requestCount) + ' left)'"
-                  icon="pi pi-hourglass"
-                  (onClick)="showExtend.set(true)"
-                  [disabled]="t.requestCount >= 3"
-                ></p-button>
-                <p-button
-                  label="Request Mark as Passed"
-                  icon="pi pi-check-circle"
-                  severity="success"
-                  [disabled]="!!pendingMarkPassedRequest()"
-                  (onClick)="requestPassed()"
-                ></p-button>
-              </div>
-              @if (pendingMarkPassedRequest()) {
-                <small class="muted">
-                  Your Mark as Passed request is waiting for a management decision.
-                </small>
-              }
-            </div>
-          }
-          @if (isAssignee() && t.statusCode === 'Open' && !t.voiceFileId) {
-            <div style="margin-top: 12px">
-              <h2>Add Voice Commitment (optional)</h2>
-              <app-voice-recorder
-                purpose="CommitmentVoice"
-                (uploadedChange)="attachVoice($event)"
-              ></app-voice-recorder>
-            </div>
-          }
-          <!-- Management change due date / assignee / pin / final -->
-          @if (
-            role === 'TopManagement' &&
-            ['Open', 'Overdue', 'RequestToExtendRevise'].includes(t.statusCode)
-          ) {
-            <div>
-              <p-divider></p-divider>
-              <div class="row">
-                <div class="field" style="min-width: 200px">
-                  <label>Change Due Date</label>
-                  <!-- FR-31 -->
-                  <p-datePicker
-                    [formControl]="newDueDate"
-                    dateFormat="yy-mm-dd"
-                    [showIcon]="true"
-                    [minDate]="today"
-                  ></p-datePicker>
-                </div>
-                <p-button
-                  label="Update Due Date"
-                  icon="pi pi-calendar"
-                  [disabled]="!newDueDate.value"
-                  (onClick)="changeDue()"
-                ></p-button>
-              </div>
-              <div class="row">
-                <div class="field" style="min-width: 220px">
-                  <label>Change Assignee</label>
-                  <p-select
-                    [formControl]="assigneeId"
-                    [options]="employeeOptions()"
-                    optionLabel="label"
-                    optionValue="value"
-                    placeholder="Select"
-                    styleClass="w-full"
-                  ></p-select>
-                </div>
-                <p-button
-                  label="Change Assignee"
-                  icon="pi pi-user-edit"
-                  [disabled]="!assigneeId.value"
-                  (onClick)="changeAssignee()"
-                ></p-button>
-              </div>
-              <p-button
-                [label]="t.isPinned ? 'Unpin' : 'Pin'"
-                icon="pi pi-bookmark"
-                severity="secondary"
-                (onClick)="pin()"
-              ></p-button>
-              <p-divider></p-divider>
-              <div class="field">
-                <label>Final Comment (optional)</label>
-                <textarea pTextarea [formControl]="finalComment" rows="2"></textarea>
-              </div>
-              <div class="row">
-                <p-button
-                  label="Mark Passed"
-                  icon="pi pi-check"
-                  severity="success"
-                  (onClick)="markFinal('Passed')"
-                ></p-button>
-                <p-button
-                  label="Mark Failed"
-                  icon="pi pi-times"
-                  severity="danger"
-                  (onClick)="markFinal('Failed')"
-                ></p-button>
-                <p-button
-                  label="Cancel"
-                  icon="pi pi-ban"
-                  severity="secondary"
-                  (onClick)="markFinal('Cancelled')"
-                ></p-button>
-              </div>
-            </div>
-          }
-          <!-- FR-23: Extend / Revise decision inline -->
-          @if (role === 'TopManagement' && pendingExtendRequest(); as r) {
-            <div>
-              <p-divider></p-divider>
-              <h2>Pending Extend/Revise Request</h2>
-              <p>
-                <b>{{ r.requestType }}</b> requested by {{ r.requestedByName }}
-              </p>
-              @if (r.requestedDueDate) {
-                <p>New due: {{ r.requestedDueDate | date: 'mediumDate' }}</p>
-              }
-              @if (r.reasonText) {
-                <p>Reason: {{ r.reasonText }}</p>
-              }
-              @if (r.voiceFileId) {
-                <app-voice-player [voiceFileId]="r.voiceFileId"></app-voice-player>
-              }
-              <div class="field">
-                <label>Decision reason (required to reject)</label>
-                <textarea pTextarea [formControl]="extendDecisionReason" rows="2"></textarea>
-              </div>
-              <div class="row">
-                <p-button
-                  label="Approve"
-                  icon="pi pi-check"
-                  severity="success"
-                  (onClick)="decideExtend(r.requestId, true)"
-                ></p-button>
-                <p-button
-                  label="Reject"
-                  icon="pi pi-times"
-                  severity="danger"
-                  (onClick)="decideExtend(r.requestId, false)"
-                ></p-button>
-              </div>
-            </div>
-          }
-          <!-- FR-26: employee's Mark as Passed request — Approve or Reject only -->
-          @if (role === 'TopManagement' && pendingMarkPassedRequest(); as mp) {
-            <div>
-              <p-divider></p-divider>
-              <h2>Mark as Passed Request</h2>
-              <p>
-                Requested by <b>{{ mp.requestedByName }}</b> on {{ mp.createdAt | date: 'medium' }}
-              </p>
-              @if (mp.reasonText) {
-                <p>Note: {{ mp.reasonText }}</p>
-              }
-              <div class="field">
-                <label>Decision reason (required to reject)</label>
-                <textarea pTextarea [formControl]="markPassedDecisionReason" rows="2"></textarea>
-              </div>
-              <div class="row">
-                <p-button
-                  label="Approve → Passed"
-                  icon="pi pi-check"
-                  severity="success"
-                  (onClick)="decideMarkPassed(mp.requestId, true)"
-                ></p-button>
-                <p-button
-                  label="Reject"
-                  icon="pi pi-times"
-                  severity="danger"
-                  (onClick)="decideMarkPassed(mp.requestId, false)"
-                ></p-button>
-              </div>
-            </div>
-          }
-          <!-- System Admin reopen -->
-          @if (
-            role === 'SystemAdmin' && (t.statusCode === 'Failed' || t.statusCode === 'Cancelled')
-          ) {
-            <div>
-              <p-button
-                label="Reopen Task"
-                icon="pi pi-refresh"
-                severity="warn"
-                (onClick)="reopen()"
-              ></p-button>
-            </div>
-          }
-        </p-card>
-      </div>
-      <div>
-        <p-card header="Timeline">
-          <p-timeline [value]="t.timeline" align="left" styleClass="timeline-list">
-            <ng-template pTemplate="marker" let-e>
-              <span class="tl-marker"><i class="pi pi-circle-fill"></i></span>
-            </ng-template>
-            <ng-template pTemplate="content" let-e>
-              <div class="tl-title">
-                <b>{{ e.actionType | humanize }}</b> · {{ e.actionByName }}
-              </div>
-              <div class="muted small">{{ e.createdAt | date: 'medium' }}</div>
-              @if (e.fromStatus || e.toStatus) {
-                <div class="muted small">{{ e.fromStatus }} → {{ e.toStatus }}</div>
-              }
-              @if (e.note) {
-                <div style="font-size: 13px; margin-top: 4px">{{ e.note }}</div>
-              }
-            </ng-template>
-          </p-timeline>
-        </p-card>
-      </div>
+            <div class="muted small">{{ e.createdAt | date: 'medium' }}</div>
+            @if (e.fromStatus || e.toStatus) {
+            <div class="muted small">{{ e.fromStatus }} → {{ e.toStatus }}</div>
+            }
+            @if (e.note) {
+            <div style="font-size: 13px; margin-top: 4px">{{ e.note }}</div>
+            }
+          </ng-template>
+        </p-timeline>
+      </p-card>
     </div>
   </div>
+</div>
 }
 
 <!-- Extend Request Dialog -->
-<p-dialog
-  header="Request Extend / Revise"
-  [visible]="showExtend()"
-  (visibleChange)="showExtend.set($event)"
-  [modal]="true"
-  [style]="{ width: '480px' }"
-  [dismissableMask]="true"
-  [draggable]="false"
->
+<p-dialog header="Request Extend / Revise" [visible]="showExtend()" (visibleChange)="showExtend.set($event)"
+  [modal]="true" [style]="{ width: '480px' }" [dismissableMask]="true" [draggable]="false">
   <div [formGroup]="extendForm">
     <div class="field">
       <label>Type</label>
-      <p-select
-        formControlName="extendType"
-        [options]="[
+      <p-select formControlName="extendType" [options]="[
           { label: 'Extend', value: 'Extend' },
           { label: 'Revise', value: 'Revise' },
-        ]"
-        optionLabel="label"
-        optionValue="value"
-        styleClass="w-full"
-      ></p-select>
+        ]" optionLabel="label" optionValue="value" styleClass="w-full"></p-select>
     </div>
     <div class="field">
-      <label
-        >New Due Date
+      <label>New Due Date
         @if (extendForm.controls.extendType.value === 'Extend') {
-          <span class="p-error">*</span>
+        <span class="p-error">*</span>
         }
       </label>
       <!-- FR-31: a requested due date can never be in the past -->
-      <p-datePicker
-        formControlName="extendDate"
-        dateFormat="yy-mm-dd"
-        [showIcon]="true"
-        [minDate]="today"
-        styleClass="w-full"
-      ></p-datePicker>
+      <p-datePicker formControlName="extendDate" dateFormat="yy-mm-dd" [showIcon]="true" [minDate]="today"
+        styleClass="w-full"></p-datePicker>
     </div>
     <div class="field">
       <label>Extra text note (optional)</label>
@@ -391,37 +261,24 @@
     </div>
     <div class="field">
       <label>Voice reason <span class="p-error">*</span> (required by policy)</label>
-      <app-voice-recorder
-        purpose="ExtendReason"
-        (uploadedChange)="extendVoiceId.set($event?.voiceFileId ?? null)"
-      ></app-voice-recorder>
+      <app-voice-recorder purpose="ExtendReason"
+        (uploadedChange)="extendVoiceId.set($event?.voiceFileId ?? null)"></app-voice-recorder>
     </div>
   </div>
 
   <ng-template pTemplate="footer">
     <p-button label="Cancel" severity="secondary" (onClick)="showExtend.set(false)"></p-button>
-    <p-button
-      label="Submit Request"
-      icon="pi pi-send"
-      [disabled]="
+    <p-button label="Submit Request" icon="pi pi-send" [disabled]="
         !extendVoiceId() ||
         (extendForm.controls.extendType.value === 'Extend' && !extendForm.controls.extendDate.value)
-      "
-      (onClick)="submitExtend()"
-    ></p-button>
+      " (onClick)="submitExtend()"></p-button>
   </ng-template>
 </p-dialog>
 
 <!-- Edit Dialog (Draft Target or Draft/Pending-Approval Commitment) -->
-<p-dialog
-  [visible]="showEdit()"
-  (visibleChange)="showEdit.set($event)"
-  [modal]="true"
-  [dismissableMask]="true"
-  [draggable]="false"
-  [header]="task()?.taskType === 'Target' ? 'Edit Draft Target' : 'Edit Commitment'"
-  [style]="{ width: '540px' }"
->
+<p-dialog [visible]="showEdit()" (visibleChange)="showEdit.set($event)" [modal]="true" [dismissableMask]="true"
+  [draggable]="false" [header]="task()?.taskType === 'Target' ? 'Edit Draft Target' : 'Edit Commitment'"
+  [style]="{ width: '540px' }">
   <div [formGroup]="editForm">
     <div class="field">
       <label>Task Name *</label>
@@ -434,91 +291,57 @@
 
     <!-- Commitment-only fields -->
     @if (task()?.taskType === 'Commitment') {
-      <div class="grid-2">
-        <div class="field">
-          <label>Task Center</label>
-          <p-select
-            formControlName="taskCenterId"
-            [options]="centerOptions()"
-            optionLabel="label"
-            optionValue="value"
-            placeholder="Select"
-            [showClear]="true"
-            styleClass="w-full"
-          ></p-select>
-        </div>
-        <div class="field">
-          <label>Event Channel</label>
-          <p-select
-            formControlName="eventChannelId"
-            [options]="channelOptions()"
-            optionLabel="label"
-            optionValue="value"
-            placeholder="Select"
-            [showClear]="true"
-            (onChange)="onEditChannel($event.value)"
-            styleClass="w-full"
-          ></p-select>
-        </div>
-        <div class="field">
-          <label>Day Event</label>
-          <p-select
-            formControlName="dayEventId"
-            [options]="editDayOptions()"
-            optionLabel="label"
-            optionValue="value"
-            placeholder="Select"
-            [showClear]="true"
-            styleClass="w-full"
-          ></p-select>
-        </div>
-        <div class="field">
-          <label>Due Date</label>
-          <p-datePicker
-            formControlName="dueDate"
-            dateFormat="yy-mm-dd"
-            [showIcon]="true"
-            [minDate]="today"
-            styleClass="w-full"
-          ></p-datePicker>
-        </div>
+    <div class="grid-2">
+      <div class="field">
+        <label>Task Center</label>
+        <p-select formControlName="taskCenterId" [options]="centerOptions()" optionLabel="label" optionValue="value"
+          placeholder="Select" [showClear]="true" styleClass="w-full"></p-select>
       </div>
+      <div class="field">
+        <label>Event Channel</label>
+        <p-select formControlName="eventChannelId" [options]="channelOptions()" optionLabel="label" optionValue="value"
+          placeholder="Select" [showClear]="true" (onChange)="onEditChannel($event.value)"
+          styleClass="w-full"></p-select>
+      </div>
+      <div class="field">
+        <label>Day Event</label>
+        <p-select formControlName="dayEventId" [options]="editDayOptions()" optionLabel="label" optionValue="value"
+          placeholder="Select" [showClear]="true" styleClass="w-full"></p-select>
+      </div>
+      <div class="field">
+        <label>Due Date</label>
+        <p-datePicker formControlName="dueDate" dateFormat="yy-mm-dd" [showIcon]="true" [minDate]="today"
+          styleClass="w-full"></p-datePicker>
+      </div>
+    </div>
     }
 
     <!-- Target-only optional voice re-record -->
     @if (task()?.taskType === 'Target') {
-      <div class="field">
-        <label>Replace Voice (optional)</label>
-        <!-- FR-01: a take under 3 seconds never becomes a voiceFileId, so it also
+    <div class="field">
+      <label>Replace Voice (optional)</label>
+      <!-- FR-01: a take under 3 seconds never becomes a voiceFileId, so it also
               holds Save Changes shut until it is re-recorded or removed. -->
-        <app-voice-recorder
-          purpose="Target"
-          (uploadedChange)="editVoiceFileId.set($event?.voiceFileId ?? null)"
-          (blockedChange)="editVoiceBlocked.set($event)"
-        ></app-voice-recorder>
-        @if (editVoiceBlocked()) {
-          <small class="p-error" style="display: block; margin-top: 6px">
-            Finish a voice recording of at least 3 seconds, or remove it, to save changes.
-          </small>
-        }
-      </div>
+      <app-voice-recorder purpose="Target" (uploadedChange)="editVoiceFileId.set($event?.voiceFileId ?? null)"
+        (blockedChange)="editVoiceBlocked.set($event)"></app-voice-recorder>
+      @if (editVoiceBlocked()) {
+      <small class="p-error" style="display: block; margin-top: 6px">
+        Finish a voice recording of at least 3 seconds, or remove it, to save changes.
+      </small>
+      }
+    </div>
     }
   </div>
 
   <ng-template pTemplate="footer">
     <p-button label="Cancel" severity="secondary" (onClick)="showEdit.set(false)"></p-button>
-    <p-button
-      label="Save Changes"
-      icon="pi pi-save"
-      [loading]="savingEdit()"
-      [disabled]="editForm.invalid || editVoiceBlocked()"
-      (onClick)="submitEdit()"
-    ></p-button>
+    <p-button label="Save Changes" icon="pi pi-save" [loading]="savingEdit()"
+      [disabled]="editForm.invalid || editVoiceBlocked()" (onClick)="submitEdit()"></p-button>
   </ng-template>
 </p-dialog>
 
 @if (!task()) {
-  <div class="container-page">
-    <p-card><span class="muted">Loading task…</span></p-card>
-  </div>
+<div class="container-page">
+  <p-card><span class="muted">Loading task…</span></p-card>
+</div>
 }

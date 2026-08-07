@@ -1,47 +1,47 @@
 <div class="container-page">
   <h1>My Performance</h1>
   @if (row(); as r) {
-    <div class="grid-2">
-      <p-card
-        ><div class="stat">
-          <div class="lbl">Total</div>
-          <div class="num">{{ r.total }}</div>
-        </div></p-card
-      >
-      <p-card
-        ><div class="stat">
-          <div class="lbl">Open</div>
-          <div class="num info">{{ r.open }}</div>
-        </div></p-card
-      >
-      <p-card
-        ><div class="stat">
-          <div class="lbl">Passed</div>
-          <div class="num success">{{ r.passed }}</div>
-        </div></p-card
-      >
-      <p-card
-        ><div class="stat">
-          <div class="lbl">Failed</div>
-          <div class="num warn">{{ r.failed }}</div>
-        </div></p-card
-      >
-      <p-card
-        ><div class="stat">
-          <div class="lbl">Overdue</div>
-          <div class="num warn">{{ r.overdue }}</div>
-        </div></p-card
-      >
-      <p-card>
-        <div class="stat">
-          <div class="lbl">Pass Rate</div>
-          <div class="num success">{{ r.passRate }}%</div>
-        </div>
-        <p-progressBar [value]="r.passRate" styleClass="mt-2"></p-progressBar>
-      </p-card>
-    </div>
+  <div class="grid-2">
+    <p-card>
+      <div class="stat">
+        <div class="lbl">Total</div>
+        <div class="num">{{ r.total }}</div>
+      </div>
+    </p-card>
+    <p-card>
+      <div class="stat">
+        <div class="lbl">Open</div>
+        <div class="num info">{{ r.open }}</div>
+      </div>
+    </p-card>
+    <p-card>
+      <div class="stat">
+        <div class="lbl">Passed</div>
+        <div class="num success">{{ r.passed }}</div>
+      </div>
+    </p-card>
+    <p-card>
+      <div class="stat">
+        <div class="lbl">Failed</div>
+        <div class="num warn">{{ r.failed }}</div>
+      </div>
+    </p-card>
+    <p-card>
+      <div class="stat">
+        <div class="lbl">Overdue</div>
+        <div class="num warn">{{ r.overdue }}</div>
+      </div>
+    </p-card>
+    <p-card>
+      <div class="stat">
+        <div class="lbl">Pass Rate</div>
+        <div class="num success">{{ r.passRate }}%</div>
+      </div>
+      <p-progressBar [value]="r.passRate" styleClass="mt-2"></p-progressBar>
+    </p-card>
+  </div>
   }
   @if (!row()) {
-    <p-card><span class="muted">Loading…</span></p-card>
+  <p-card><span class="muted">Loading…</span></p-card>
   }
 </div>

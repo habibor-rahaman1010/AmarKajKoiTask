@@ -3,11 +3,7 @@
   <p-card styleClass="form-card">
     <div class="field">
       <label>Task Name (short label)</label>
-      <input
-        pInputText
-        formControlName="taskName"
-        placeholder="e.g. Reduce reject rate in cutting"
-      />
+      <input pInputText formControlName="taskName" placeholder="e.g. Reduce reject rate in cutting" />
     </div>
     <div class="field">
       <label>Description (optional)</label>
@@ -15,45 +11,30 @@
     </div>
 
     <h2>Voice Recording</h2>
-    <app-voice-recorder
-      purpose="Target"
-      (uploadedChange)="voiceFileId.set($event?.voiceFileId ?? null)"
-    ></app-voice-recorder>
+    <app-voice-recorder purpose="Target"
+      (uploadedChange)="voiceFileId.set($event?.voiceFileId ?? null)"></app-voice-recorder>
 
     <p-divider></p-divider>
 
     <div class="row">
-      <p-button
-        label="Save as Draft"
-        icon="pi pi-save"
-        severity="secondary"
-        [outlined]="true"
-        [loading]="savingDraft()"
-        [disabled]="!voiceFileId() || savingPost()"
-        (onClick)="save(false)"
-      ></p-button>
+      <p-button label="Save as Draft" icon="pi pi-save" severity="secondary" [outlined]="true" [loading]="savingDraft()"
+        [disabled]="!voiceFileId() || savingPost()" (onClick)="save(false)"></p-button>
 
-      <p-button
-        label="Post to Voice Reviewer"
-        icon="pi pi-send"
-        severity="success"
-        [loading]="savingPost()"
-        [disabled]="!voiceFileId() || savingDraft()"
-        (onClick)="save(true)"
-      ></p-button>
+      <p-button label="Post to Voice Reviewer" icon="pi pi-send" severity="success" [loading]="savingPost()"
+        [disabled]="!voiceFileId() || savingDraft()" (onClick)="save(true)"></p-button>
     </div>
 
     @if (!voiceFileId()) {
-      <small class="muted" style="display: block; margin-top: 8px">
-        <i class="pi pi-info-circle"></i>
-        Record the voice above (minimum 3 seconds) to enable Save as Draft and Post.
-      </small>
+    <small class="muted" style="display: block; margin-top: 8px">
+      <i class="pi pi-info-circle"></i>
+      Record the voice above (minimum 3 seconds) to enable Save as Draft and Post.
+    </small>
     }
     @if (voiceFileId()) {
-      <small class="muted" style="display: block; margin-top: 8px">
-        <b>Save as Draft:</b> keeps it private, editable/deletable later &nbsp;·&nbsp;
-        <b>Post:</b> sends to Voice Reviewer to convert into an Open task.
-      </small>
+    <small class="muted" style="display: block; margin-top: 8px">
+      <b>Save as Draft:</b> keeps it private, editable/deletable later &nbsp;·&nbsp;
+      <b>Post:</b> sends to Voice Reviewer to convert into an Open task.
+    </small>
     }
   </p-card>
 </div>

@@ -3,14 +3,8 @@
   <p class="muted">Tasks you created (Commitments or Voice Targets)</p>
 
   <p-card>
-    <p-table
-      [value]="tasks()"
-      [loading]="loading()"
-      [rowHover]="true"
-      [paginator]="true"
-      [rows]="10"
-      styleClass="p-datatable-sm"
-    >
+    <p-table [value]="tasks()" [loading]="loading()" [rowHover]="true" [paginator]="true" [rows]="10"
+      styleClass="p-datatable-sm">
       <ng-template pTemplate="header">
         <tr>
           <th>Task</th>
@@ -25,10 +19,7 @@
         <tr>
           <td>
             @if (t.isPinned) {
-              <i
-                class="pi pi-bookmark-fill"
-                style="color: var(--p-orange-500); margin-right: 4px"
-              ></i>
+            <i class="pi pi-bookmark-fill" style="color: var(--p-orange-500); margin-right: 4px"></i>
             }
             {{ t.taskName }}
           </td>
@@ -39,13 +30,8 @@
           </td>
           <td>{{ t.requestCount }}/3</td>
           <td>
-            <p-button
-              icon="pi pi-external-link"
-              severity="secondary"
-              [text]="true"
-              [rounded]="true"
-              [routerLink]="['/tasks', t.taskId]"
-            ></p-button>
+            <p-button icon="pi pi-external-link" severity="secondary" [text]="true" [rounded]="true"
+              [routerLink]="['/tasks', t.taskId]"></p-button>
           </td>
         </tr>
       </ng-template>

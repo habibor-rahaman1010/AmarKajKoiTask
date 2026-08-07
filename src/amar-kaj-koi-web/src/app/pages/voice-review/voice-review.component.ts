@@ -20,16 +20,12 @@ import {
   DayEventRef,
   EmployeeRef,
   EventChannelRef,
+  SelectOption,
   TaskCenterRef,
   TaskListItem,
 } from '../../core/models';
 import { ToastService } from '../../core/toast.service';
 import { VoicePlayerComponent } from '../../shared/voice-player.component';
-
-interface SelectOption {
-  label: string;
-  value: string;
-}
 
 /** The fields a reviewer fills in to turn one voice target into an open task. */
 type ReviewForm = FormGroup<{

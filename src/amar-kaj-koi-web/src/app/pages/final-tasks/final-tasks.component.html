@@ -35,28 +35,14 @@
   <p-card>
     <div class="between">
       <div class="row">
-        <p-select
-          [formControl]="filterStatus"
-          [options]="filterOptions"
-          optionLabel="label"
-          optionValue="value"
-          placeholder="All"
-          [showClear]="true"
-          (onChange)="reload()"
-          styleClass="w-64"
-        ></p-select>
+        <p-select [formControl]="filterStatus" [options]="filterOptions" optionLabel="label" optionValue="value"
+          placeholder="All" [showClear]="true" (onChange)="reload()" styleClass="w-64"></p-select>
       </div>
       <div class="muted small">Showing {{ rows().length }} tasks</div>
     </div>
 
-    <p-table
-      [value]="rows()"
-      [loading]="loading()"
-      [rowHover]="true"
-      [paginator]="true"
-      [rows]="15"
-      styleClass="p-datatable-sm"
-    >
+    <p-table [value]="rows()" [loading]="loading()" [rowHover]="true" [paginator]="true" [rows]="15"
+      styleClass="p-datatable-sm">
       <ng-template pTemplate="header">
         <tr>
           <th>Task</th>
@@ -79,13 +65,8 @@
           </td>
           <td class="muted small">{{ t.finalComment || '—' }}</td>
           <td>
-            <p-button
-              icon="pi pi-external-link"
-              severity="secondary"
-              [text]="true"
-              [rounded]="true"
-              [routerLink]="['/tasks', t.taskId]"
-            ></p-button>
+            <p-button icon="pi pi-external-link" severity="secondary" [text]="true" [rounded]="true"
+              [routerLink]="['/tasks', t.taskId]"></p-button>
           </td>
         </tr>
       </ng-template>

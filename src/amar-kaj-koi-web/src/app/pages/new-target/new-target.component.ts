@@ -33,8 +33,8 @@ export class NewTargetComponent {
   private readonly router = inject(Router);
 
   public readonly form = this.fb.nonNullable.group({
-    taskName: '',
-    description: '',
+    taskName: [''],
+    description: [''],
   });
 
   /**
@@ -56,8 +56,12 @@ export class NewTargetComponent {
       return;
     }
 
-    if (post) this.savingPost.set(true);
-    else this.savingDraft.set(true);
+    if (post) {
+      this.savingPost.set(true);
+    }
+    else {
+      this.savingDraft.set(true);
+    }
 
     const { taskName, description } = this.form.getRawValue();
 

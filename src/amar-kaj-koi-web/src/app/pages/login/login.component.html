@@ -14,23 +14,11 @@
       </div>
       <div class="field">
         <label for="p">Password</label>
-        <p-password
-          id="p"
-          formControlName="password"
-          [feedback]="false"
-          [toggleMask]="true"
-          inputStyleClass="w-full"
-          styleClass="w-full"
-        ></p-password>
+        <p-password id="p" formControlName="password" [feedback]="false" [toggleMask]="true" inputStyleClass="w-full"
+          styleClass="w-full"></p-password>
       </div>
-      <p-button
-        type="submit"
-        label="Sign In"
-        icon="pi pi-sign-in"
-        [loading]="submitting()"
-        [disabled]="form.invalid"
-        styleClass="w-full"
-      ></p-button>
+      <p-button type="submit" label="Sign In" icon="pi pi-sign-in" [loading]="submitting()" [disabled]="form.invalid"
+        styleClass="w-full"></p-button>
     </form>
 
     <div class="samples muted">

@@ -55,8 +55,12 @@ export class DashboardComponent implements OnInit {
     if (role === 'TopManagement') {
       return this.count('PendingManagementApproval') + this.count('RequestToExtendRevise');
     }
-    if (role === 'VoiceReviewer') return this.count('PendingVoiceReview');
-    if (role === 'Employee') return this.count('Open') + this.count('Overdue');
+    if (role === 'VoiceReviewer') {
+      return this.count('PendingVoiceReview');
+    }
+    if (role === 'Employee') {
+      return this.count('Open') + this.count('Overdue');
+    }
     return 0;
   }
 }

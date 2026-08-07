@@ -36,7 +36,10 @@ namespace AmarKajKoi.Controllers
         public async Task<IActionResult> Get(Guid taskId)
         {
             var d = await _tasks.GetDetailAsync(taskId);
-            if (d == null) return NotFound();
+            if (d == null)
+            {
+                return NotFound();
+            }
             return Ok(d);
         }
 

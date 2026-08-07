@@ -4,14 +4,8 @@
     <i class="pi pi-check-square text-green-500"></i>
     <span>Amar Kaj Koi</span>
   </div>
-  <p-button
-    icon="pi pi-bars"
-    severity="secondary"
-    [text]="true"
-    [rounded]="true"
-    (onClick)="mobileMenuOpen.set(true)"
-    styleClass="!text-white"
-  ></p-button>
+  <p-button icon="pi pi-bars" severity="secondary" [text]="true" [rounded]="true" (onClick)="mobileMenuOpen.set(true)"
+    styleClass="!text-white"></p-button>
 </div>
 
 <div class="layout-body">
@@ -21,13 +15,8 @@
   </aside>
 
   <!-- Mobile drawer -->
-  <p-drawer
-    [visible]="mobileMenuOpen()"
-    (visibleChange)="mobileMenuOpen.set($event)"
-    position="left"
-    styleClass="mobile-drawer"
-    [style]="{ width: '260px' }"
-  >
+  <p-drawer [visible]="mobileMenuOpen()" (visibleChange)="mobileMenuOpen.set($event)" position="left"
+    styleClass="mobile-drawer" [style]="{ width: '260px' }">
     <ng-template pTemplate="header">
       <div class="flex items-center gap-2 text-white">
         <i class="pi pi-check-square text-green-500"></i>
@@ -40,15 +29,15 @@
   <main class="main-area min-w-0">
     <!-- FR-38: connection / offline voice queue status -->
     @if (!offline.online() || offline.pendingCount() > 0) {
-      <div class="offline-strip">
-        <i class="pi" [ngClass]="offline.online() ? 'pi-cloud-upload' : 'pi-wifi'"></i>
-        @if (!offline.online()) {
-          <span>You are offline. Voice can still be recorded and will sync later.</span>
-        }
-        @if (offline.online() && offline.pendingCount() > 0) {
-          <span> Syncing {{ offline.pendingCount() }} offline voice recording(s)… </span>
-        }
-      </div>
+    <div class="offline-strip">
+      <i class="pi" [ngClass]="offline.online() ? 'pi-cloud-upload' : 'pi-wifi'"></i>
+      @if (!offline.online()) {
+      <span>You are offline. Voice can still be recorded and will sync later.</span>
+      }
+      @if (offline.online() && offline.pendingCount() > 0) {
+      <span> Syncing {{ offline.pendingCount() }} offline voice recording(s)… </span>
+      }
+    </div>
     }
     <!-- Only this scrolls, so the sidebar and the offline strip stay put. -->
     <div class="main-scroll" #mainScroll>
@@ -67,25 +56,14 @@
   <p-menu [model]="menuItems()" styleClass="side-menu" (click)="mobileMenuOpen.set(false)"></p-menu>
 
   @if (auth.user(); as u) {
-    <div class="user-card">
-      <p-avatar
-        [label]="initial(u.fullName)"
-        shape="circle"
-        size="large"
-        styleClass="avatar"
-      ></p-avatar>
-      <div class="user-info">
-        <div class="user-name">{{ u.fullName }}</div>
-        <p-tag [value]="u.roleName" severity="info" styleClass="role-tag"></p-tag>
-      </div>
-      <p-button
-        icon="pi pi-sign-out"
-        severity="secondary"
-        [rounded]="true"
-        [text]="true"
-        (onClick)="logout()"
-        pTooltip="Sign out"
-      ></p-button>
+  <div class="user-card">
+    <p-avatar [label]="initial(u.fullName)" shape="circle" size="large" styleClass="avatar"></p-avatar>
+    <div class="user-info">
+      <div class="user-name">{{ u.fullName }}</div>
+      <p-tag [value]="u.roleName" severity="info" styleClass="role-tag"></p-tag>
     </div>
+    <p-button icon="pi pi-sign-out" severity="secondary" [rounded]="true" [text]="true" (onClick)="logout()"
+      pTooltip="Sign out"></p-button>
+  </div>
   }
 </ng-template>

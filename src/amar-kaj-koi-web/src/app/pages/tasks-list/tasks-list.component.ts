@@ -11,7 +11,7 @@ import { TableModule } from 'primeng/table';
 import { ApiService, TaskFilter } from '../../core/api.service';
 import { DialogService } from '../../core/dialog.service';
 import { AuthService } from '../../core/auth.service';
-import { StatusRef, TaskListItem } from '../../core/models';
+import { SelectOption, StatusRef, TaskListItem } from '../../core/models';
 import { ToastService } from '../../core/toast.service';
 
 @Component({
@@ -32,6 +32,9 @@ import { ToastService } from '../../core/toast.service';
   styleUrls: ['./tasks-list.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
+
+
+
 export class TasksListComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly api = inject(ApiService);
@@ -40,7 +43,7 @@ export class TasksListComponent implements OnInit {
   public readonly auth = inject(AuthService);
 
   public readonly statuses = signal<StatusRef[]>([]);
-  public readonly statusOptions = signal<{ label: string; value: string }[]>([]);
+  public readonly statusOptions = signal<SelectOption[]>([]);
   public readonly tasks = signal<TaskListItem[]>([]);
   public readonly loading = signal(false);
 
