@@ -60,7 +60,9 @@ namespace AmarKajKoi.ServicesImplement
             {
                 task.TaskId = await _uow.Tasks.CreateAsync(task);
                 if (dto.VoiceFileId.HasValue)
+                {
                     await _uow.VoiceFiles.UpdateTaskLinkAsync(dto.VoiceFileId.Value, task.TaskId);
+                }
                 await LogAsync(task.TaskId, userId, "Created", null, task.StatusId, "Target created.");
                 if (dto.PostImmediately)
                 {
@@ -77,7 +79,9 @@ namespace AmarKajKoi.ServicesImplement
         public async Task<Guid> CreateCommitmentAsync(Guid userId, CommitmentFormCreateDto dto)
         {
             if (dto.DueDate.HasValue && dto.DueDate.Value < DateTime.UtcNow.Date)
+            {
                 throw new InvalidOperationException("Due date cannot be in the past.");
+            }
 
             var task = new TaskItem
             {
@@ -99,7 +103,9 @@ namespace AmarKajKoi.ServicesImplement
             {
                 task.TaskId = await _uow.Tasks.CreateAsync(task);
                 if (dto.VoiceFileId.HasValue)
+                {
                     await _uow.VoiceFiles.UpdateTaskLinkAsync(dto.VoiceFileId.Value, task.TaskId);
+                }
                 await LogAsync(task.TaskId, userId, "Created", null, task.StatusId, "Commitment created.");
                 if (dto.PostImmediately)
                 {
@@ -117,11 +123,17 @@ namespace AmarKajKoi.ServicesImplement
         {
             var task = await _uow.Tasks.GetByIdAsync(dto.TaskId) ?? throw new InvalidOperationException("Task not found.");
             if (task.CreatedByUserId != userId)
+            {
                 throw new UnauthorizedAccessException("Only creator can edit commitment.");
+            }
             if (task.StatusId != TaskStatusIds.Draft && task.StatusId != TaskStatusIds.PendingManagementApproval)
+            {
                 throw new InvalidOperationException("Only Draft or Pending Approval commitments can be edited.");
+            }
             if (dto.DueDate.HasValue && dto.DueDate.Value < DateTime.UtcNow.Date)
+            {
                 throw new InvalidOperationException("Due date cannot be in the past.");
+            }
 
             task.TaskName = dto.TaskName;
             task.Description = dto.Description;
@@ -144,35 +156,54 @@ namespace AmarKajKoi.ServicesImplement
         {
             var task = await _uow.Tasks.GetByIdAsync(dto.TaskId) ?? throw new InvalidOperationException("Task not found.");
             if (task.CreatedByUserId != userId)
+            {
                 throw new UnauthorizedAccessException("Only creator can edit target.");
+            }
             if (task.StatusId != TaskStatusIds.Draft)
+            {
                 throw new InvalidOperationException("Only Draft targets can be edited.");
+            }
             if (task.TaskType != "Target")
+            {
                 throw new InvalidOperationException("Not a Target task.");
+            }
 
             task.TaskName = string.IsNullOrWhiteSpace(dto.TaskName) ? task.TaskName : dto.TaskName;
             task.Description = dto.Description;
-            if (dto.VoiceFileId.HasValue) task.VoiceFileId = dto.VoiceFileId;
+            if (dto.VoiceFileId.HasValue)
+            { 
+                task.VoiceFileId = dto.VoiceFileId;
+            } 
 
             _uow.Begin();
             try
             {
                 await _uow.Tasks.UpdateAsync(task);
                 if (dto.VoiceFileId.HasValue)
+                {
                     await _uow.VoiceFiles.UpdateTaskLinkAsync(dto.VoiceFileId.Value, task.TaskId);
+                }
                 await LogAsync(task.TaskId, userId, "Edited", null, null, "Target updated.");
                 _uow.Commit();
             }
-            catch { _uow.Rollback(); throw; }
+            catch 
+            { 
+                _uow.Rollback();
+                throw;
+            }
         }
 
         public async Task PostTaskAsync(Guid userId, Guid taskId)
         {
             var task = await _uow.Tasks.GetByIdAsync(taskId) ?? throw new InvalidOperationException("Task not found.");
             if (task.StatusId != TaskStatusIds.Draft)
+            {
                 throw new InvalidOperationException("Only Draft can be posted.");
+            }
             if (task.CreatedByUserId != userId)
+            {
                 throw new UnauthorizedAccessException("Only creator can post.");
+            }
 
             var nextStatus = task.TaskType == "Target"
                 ? TaskStatusIds.PendingVoiceReview
@@ -184,19 +215,29 @@ namespace AmarKajKoi.ServicesImplement
                 await _uow.Tasks.UpdateStatusAsync(taskId, nextStatus);
                 await LogAsync(taskId, userId, "Posted", task.StatusId, nextStatus);
                 if (nextStatus == TaskStatusIds.PendingVoiceReview)
+                {
                     await NotifyReviewersAsync(taskId, "New voice target pending review");
+                }
                 else
+                {
                     await NotifyManagementAsync(taskId, "New commitment awaiting your approval");
+                }
                 _uow.Commit();
             }
-            catch { _uow.Rollback(); throw; }
+            catch 
+            { 
+                _uow.Rollback(); 
+                throw; 
+            }
         }
 
         public async Task DeleteDraftAsync(Guid userId, Guid taskId)
         {
             var task = await _uow.Tasks.GetByIdAsync(taskId) ?? throw new InvalidOperationException("Task not found.");
             if (task.StatusId != TaskStatusIds.Draft || task.CreatedByUserId != userId)
+            {
                 throw new InvalidOperationException("Only Draft created by user can be deleted.");
+            }
             _uow.Begin();
             try
             {
@@ -204,7 +245,11 @@ namespace AmarKajKoi.ServicesImplement
                 await LogAsync(taskId, userId, "DraftDeleted", task.StatusId, TaskStatusIds.Cancelled);
                 _uow.Commit();
             }
-            catch { _uow.Rollback(); throw; }
+            catch 
+            { 
+                _uow.Rollback(); 
+                throw; 
+            }
         }
 
         // ---- APPROVAL FLOW ----
@@ -218,13 +263,17 @@ namespace AmarKajKoi.ServicesImplement
             try
             {
                 if (dto.AssignedToUserId.HasValue)
+                {
                     await _uow.Tasks.UpdateAssigneeAsync(dto.TaskId, dto.AssignedToUserId.Value);
+                }
                 await _uow.Tasks.UpdateStatusAsync(dto.TaskId, TaskStatusIds.Open);
                 await LogAsync(dto.TaskId, userId, "Approved", task.StatusId, TaskStatusIds.Open);
 
                 var assignee = dto.AssignedToUserId ?? task.AssignedToUserId;
                 if (assignee.HasValue)
+                {
                     await NotifyAsync(assignee.Value, dto.TaskId, "Your task is now Open", task.TaskName);
+                }
                 _uow.Commit();
             }
             catch { _uow.Rollback(); throw; }
@@ -233,10 +282,14 @@ namespace AmarKajKoi.ServicesImplement
         public async Task RejectCommitmentAsync(Guid userId, RejectDto dto)
         {
             if (string.IsNullOrWhiteSpace(dto.Reason))
+            {
                 throw new InvalidOperationException("Reason is required to reject.");
+            }
             var task = await _uow.Tasks.GetByIdAsync(dto.TaskId) ?? throw new InvalidOperationException("Task not found.");
             if (task.StatusId != TaskStatusIds.PendingManagementApproval)
+            {
                 throw new InvalidOperationException("Task is not pending approval.");
+            }
 
             _uow.Begin();
             try
@@ -252,10 +305,14 @@ namespace AmarKajKoi.ServicesImplement
         public async Task SendBackCommitmentAsync(Guid userId, SendBackDto dto)
         {
             if (string.IsNullOrWhiteSpace(dto.Reason))
+            {
                 throw new InvalidOperationException("Reason is required to send back.");
+            }
             var task = await _uow.Tasks.GetByIdAsync(dto.TaskId) ?? throw new InvalidOperationException("Task not found.");
             if (task.StatusId != TaskStatusIds.PendingManagementApproval)
+            {
                 throw new InvalidOperationException("Task is not pending approval.");
+            }
 
             _uow.Begin();
             try
@@ -273,9 +330,14 @@ namespace AmarKajKoi.ServicesImplement
         {
             var task = await _uow.Tasks.GetByIdAsync(dto.TaskId) ?? throw new InvalidOperationException("Task not found.");
             if (task.StatusId != TaskStatusIds.PendingVoiceReview)
+            {
                 throw new InvalidOperationException("Task is not pending voice review.");
+            }
+
             if (dto.DueDate < DateTime.UtcNow.Date)
+            {
                 throw new InvalidOperationException("Due date cannot be in the past.");
+            }
 
             task.TaskName = dto.TaskName;
             task.TaskCenterId = dto.TaskCenterId;
@@ -299,10 +361,15 @@ namespace AmarKajKoi.ServicesImplement
         public async Task SendBackVoiceReviewAsync(Guid userId, SendBackDto dto)
         {
             if (string.IsNullOrWhiteSpace(dto.Reason))
+            {
                 throw new InvalidOperationException("Reason is required.");
+            }
             var task = await _uow.Tasks.GetByIdAsync(dto.TaskId) ?? throw new InvalidOperationException("Task not found.");
+            
             if (task.StatusId != TaskStatusIds.PendingVoiceReview)
+            {
                 throw new InvalidOperationException("Task is not pending voice review.");
+            }
 
             _uow.Begin();
             try
@@ -320,22 +387,41 @@ namespace AmarKajKoi.ServicesImplement
         {
             var task = await _uow.Tasks.GetByIdAsync(dto.TaskId) ?? throw new InvalidOperationException("Task not found.");
             if (task.AssignedToUserId != userId)
+            {
                 throw new UnauthorizedAccessException("Only assignee can request extend/revise.");
+            }
+
             if (task.StatusId != TaskStatusIds.Open && task.StatusId != TaskStatusIds.Overdue)
+            {
                 throw new InvalidOperationException("Only Open or Overdue tasks can request extend/revise.");
+            }
+
             if (task.RequestCount >= 3)
+            {
                 throw new InvalidOperationException("Maximum 3 requests reached.");
+            }
+
             // FR-20: every extend/revise request requires a voice reason.
             if (!dto.VoiceFileId.HasValue)
+            {
                 throw new InvalidOperationException("Voice reason is required for Extend/Revise requests.");
+            }
+
             // FR-31: a requested due date can never be in the past.
             if (dto.RequestedDueDate.HasValue && dto.RequestedDueDate.Value < DateTime.UtcNow.Date)
+            {
                 throw new InvalidOperationException("Requested due date cannot be in the past.");
+            }
+
             // An Extend is meaningless without the date it extends to.
             if (dto.RequestType == "Extend" && !dto.RequestedDueDate.HasValue)
+            {
                 throw new InvalidOperationException("A new due date is required for an Extend request.");
+            }
             if (await _uow.ExtendRequests.HasPendingAsync(dto.TaskId, dto.RequestType))
+            {
                 throw new InvalidOperationException("A request of this type is already awaiting a decision.");
+            }
 
             _uow.Begin();
             try
@@ -364,10 +450,16 @@ namespace AmarKajKoi.ServicesImplement
         {
             var req = await _uow.ExtendRequests.GetByIdAsync(dto.RequestId)
                        ?? throw new InvalidOperationException("Request not found.");
+
             if (req.Status != "Pending")
+            {
                 throw new InvalidOperationException("Request already decided.");
+            }
+
             if (!dto.Approve && string.IsNullOrWhiteSpace(dto.Reason))
+            {
                 throw new InvalidOperationException("Reason is required to reject.");
+            }
 
             var task = await _uow.Tasks.GetByIdAsync(req.TaskId) ?? throw new InvalidOperationException("Task not found.");
 
@@ -394,7 +486,9 @@ namespace AmarKajKoi.ServicesImplement
                     if (dto.Approve)
                     {
                         if (req.RequestedDueDate.HasValue)
+                        {
                             await _uow.Tasks.UpdateDueDateAsync(task.TaskId, req.RequestedDueDate.Value);
+                        }
                         await _uow.Tasks.UpdateStatusAsync(task.TaskId, TaskStatusIds.Open);
                         await LogAsync(task.TaskId, userId, "ExtendApproved", TaskStatusIds.RequestToExtendRevise, TaskStatusIds.Open);
                     }
@@ -422,11 +516,19 @@ namespace AmarKajKoi.ServicesImplement
         {
             var task = await _uow.Tasks.GetByIdAsync(dto.TaskId) ?? throw new InvalidOperationException("Task not found.");
             if (task.AssignedToUserId != userId)
+            {
                 throw new UnauthorizedAccessException("Only assignee can request Mark as Passed.");
+            }
+
             if (task.StatusId != TaskStatusIds.Open && task.StatusId != TaskStatusIds.Overdue)
+            {
                 throw new InvalidOperationException("Only Open or Overdue tasks can request Mark as Passed.");
+            }
+
             if (await _uow.ExtendRequests.HasPendingAsync(dto.TaskId, "MarkPassed"))
-                throw new InvalidOperationException("A Mark as Passed request is already awaiting a decision.");
+            {
+                 throw new InvalidOperationException("A Mark as Passed request is already awaiting a decision.");
+            }
 
             _uow.Begin();
             try
@@ -466,10 +568,14 @@ namespace AmarKajKoi.ServicesImplement
             {
                 await _uow.Tasks.UpdateStatusAsync(dto.TaskId, newStatus);
                 if (!string.IsNullOrWhiteSpace(dto.Comment))
+                {
                     await _uow.Tasks.SetFinalCommentAsync(dto.TaskId, dto.Comment);
+                }
                 await LogAsync(dto.TaskId, userId, $"MarkedAs{dto.Decision}", task.StatusId, newStatus, dto.Comment);
                 if (task.AssignedToUserId.HasValue)
+                {
                     await NotifyAsync(task.AssignedToUserId.Value, dto.TaskId, $"Task marked as {dto.Decision}", dto.Comment);
+                }
                 _uow.Commit();
             }
             catch { _uow.Rollback(); throw; }
@@ -493,7 +599,9 @@ namespace AmarKajKoi.ServicesImplement
         public async Task ChangeDueDateAsync(Guid userId, ChangeDueDateDto dto)
         {
             if (dto.NewDueDate < DateTime.UtcNow.Date)
+            {
                 throw new InvalidOperationException("Due date cannot be in the past.");
+            }
             var task = await _uow.Tasks.GetByIdAsync(dto.TaskId) ?? throw new InvalidOperationException("Task not found.");
 
             _uow.Begin();
@@ -504,7 +612,9 @@ namespace AmarKajKoi.ServicesImplement
                 await LogAsync(dto.TaskId, userId, "DueDateChanged", null, null,
                     $"From {prev} to {dto.NewDueDate:yyyy-MM-dd}. {dto.Note}");
                 if (task.AssignedToUserId.HasValue)
+                {
                     await NotifyAsync(task.AssignedToUserId.Value, dto.TaskId, "Due date updated", dto.NewDueDate.ToString("yyyy-MM-dd"));
+                }
                 _uow.Commit();
             }
             catch { _uow.Rollback(); throw; }
@@ -541,9 +651,13 @@ namespace AmarKajKoi.ServicesImplement
         {
             var task = await _uow.Tasks.GetByIdAsync(taskId) ?? throw new InvalidOperationException("Task not found.");
             if (task.AssignedToUserId != userId)
+            {
                 throw new UnauthorizedAccessException("Only assignee can attach voice.");
+            }
             if (task.StatusId != TaskStatusIds.Open)
+            {
                 throw new InvalidOperationException("Only Open tasks accept voice commitment.");
+            }
 
             _uow.Begin();
             try
@@ -553,16 +667,44 @@ namespace AmarKajKoi.ServicesImplement
                 await LogAsync(taskId, userId, "VoiceCommitmentAdded");
                 _uow.Commit();
             }
-            catch { _uow.Rollback(); throw; }
+            catch 
+            { 
+                _uow.Rollback();
+                throw;
+            }
         }
 
         // ---- QUERY ----
         public async Task<TaskDetailDto?> GetDetailAsync(Guid taskId)
         {
             var detail = await _uow.Tasks.GetDetailAsync(taskId);
-            if (detail == null) return null;
+            if (detail == null)
+            {
+                return null;
+            }
+
+            var bdTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Bangladesh Standard Time");
+            detail.CreatedAt = TimeZoneInfo.ConvertTimeFromUtc(detail.CreatedAt, bdTimeZone);
+
+            if (detail.DueDate.HasValue)
+            {
+                detail.DueDate = TimeZoneInfo.ConvertTimeFromUtc(
+                    detail.DueDate.Value,
+                    bdTimeZone);
+            }
+
             detail.Timeline = (await _uow.Timeline.GetByTaskAsync(taskId)).ToList();
+
+            foreach (var item in detail.Timeline)
+            {
+                item.CreatedAt = TimeZoneInfo.ConvertTimeFromUtc(item.CreatedAt, bdTimeZone);
+            }
+
             detail.ExtendRequests = (await _uow.ExtendRequests.GetByTaskAsync(taskId)).ToList();
+            foreach (var item in detail.ExtendRequests)
+            {
+                item.CreatedAt = TimeZoneInfo.ConvertTimeFromUtc(item.CreatedAt, bdTimeZone);
+            }
             return detail;
         }
 
@@ -585,7 +727,10 @@ namespace AmarKajKoi.ServicesImplement
             }
         }
 
-        public Task<IReadOnlyList<ExtendRequestDto>> GetPendingExtendRequestsAsync() => _uow.ExtendRequests.GetPendingForManagementAsync();
+        public Task<IReadOnlyList<ExtendRequestDto>> GetPendingExtendRequestsAsync() 
+        { 
+            return _uow.ExtendRequests.GetPendingForManagementAsync();
+        }
 
         public async Task<int> RunOverdueSweepAsync()
         {
@@ -596,7 +741,11 @@ namespace AmarKajKoi.ServicesImplement
                 _uow.Commit();
                 return affected;
             }
-            catch { _uow.Rollback(); throw; }
+            catch 
+            { 
+                _uow.Rollback(); 
+                throw; 
+            }
         }
 
         public async Task<PerformanceDto> GetSelfPerformanceAsync(Guid userId)
@@ -646,7 +795,9 @@ namespace AmarKajKoi.ServicesImplement
         {
             var task = await _uow.Tasks.GetByIdAsync(taskId) ?? throw new InvalidOperationException("Task not found.");
             if (task.StatusId != TaskStatusIds.Failed && task.StatusId != TaskStatusIds.Cancelled)
+            {
                 throw new InvalidOperationException("Only Failed or Cancelled tasks can be reopened.");
+            }
 
             _uow.Begin();
             try
@@ -654,17 +805,25 @@ namespace AmarKajKoi.ServicesImplement
                 await _uow.Tasks.UpdateStatusAsync(taskId, TaskStatusIds.Open);
                 await LogAsync(taskId, userId, "Reopened", task.StatusId, TaskStatusIds.Open);
                 if (task.AssignedToUserId.HasValue)
+                {
                     await NotifyAsync(task.AssignedToUserId.Value, taskId, "Task reopened by admin", task.TaskName);
+                }
                 _uow.Commit();
             }
-            catch { _uow.Rollback(); throw; }
+            catch 
+            { 
+                _uow.Rollback();
+                throw; 
+            }
         }
 
         // ---- notification broadcast helpers ----
         private async Task NotifyManagementAsync(Guid taskId, string title)
         {
             var mgmt = await _uow.Users.GetByRoleAsync("TopManagement");
-            if (mgmt.Count == 0) return;
+            if (mgmt.Count == 0) { 
+                return;
+            }
             await _uow.Notifications.CreateManyAsync(mgmt.Select(u => new Notification
             {
                 UserId = u.UserId, TaskId = taskId, Title = title, Body = null
@@ -675,7 +834,10 @@ namespace AmarKajKoi.ServicesImplement
         private async Task NotifyReviewersAsync(Guid taskId, string title)
         {
             var rev = await _uow.Users.GetByRoleAsync("VoiceReviewer");
-            if (rev.Count == 0) return;
+            if (rev.Count == 0)
+            {
+                return;
+            }
             await _uow.Notifications.CreateManyAsync(rev.Select(u => new Notification
             {
                 UserId = u.UserId, TaskId = taskId, Title = title, Body = null

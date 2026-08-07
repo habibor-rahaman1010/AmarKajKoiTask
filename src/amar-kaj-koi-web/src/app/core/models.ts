@@ -1,3 +1,7 @@
+export interface SelectOption {
+  label: string;
+  value: string;
+}
 export interface UserProfile {
   userId: string;
   fullName: string;

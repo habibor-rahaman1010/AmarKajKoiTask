@@ -33,8 +33,8 @@ export class NewTargetComponent {
   private readonly router = inject(Router);
 
   public readonly form = this.fb.nonNullable.group({
-    taskName: '',
-    description: '',
+    taskName: [''],
+    description: [''],
   });
 
   /**
